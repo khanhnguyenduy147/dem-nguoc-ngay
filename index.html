@@ -27,8 +27,18 @@ nav{display:flex;gap:3px;}
 nav button{background:none;border:none;cursor:pointer;color:var(--muted);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:500;padding:8px 13px;border-radius:8px;transition:all .2s;}
 nav button.active,nav button:hover{background:var(--surface2);color:var(--text);}
 nav button.active{color:var(--gold);}
+.header-right{display:flex;align-items:center;gap:12px;}
 .header-time{font-size:13px;color:var(--muted);text-align:right;line-height:1.4;white-space:nowrap;}
 .header-time strong{color:var(--text);font-size:15px;display:block;}
+
+/* ── AUTH BUTTON IN HEADER ── */
+.auth-btn{background:var(--surface2);border:1px solid var(--border2);color:var(--muted);cursor:pointer;font-family:'Be Vietnam Pro',sans-serif;font-size:12px;font-weight:700;padding:6px 14px;border-radius:8px;transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:5px;}
+.auth-btn:hover{border-color:var(--purple);color:var(--purple);}
+.auth-btn.logged{border-color:rgba(46,196,182,.4);color:var(--teal);}
+.auth-btn.logged:hover{border-color:var(--red);color:var(--red);}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0;}
+.sync-dot.syncing{background:var(--gold);animation:pulse 1s infinite;}
+.sync-dot.error{background:var(--red);}
 
 /* ── LAYOUT ── */
 .container{max-width:1400px;margin:0 auto;padding:28px;position:relative;z-index:1;}
@@ -260,6 +270,20 @@ nav button.active{color:var(--gold);}
 .conf-msg{font-size:13px;color:var(--muted);margin-bottom:22px;line-height:1.5;}
 .conf-btns{display:flex;gap:9px;}
 
+/* ── AUTH MODAL ── */
+.auth-tabs{display:flex;gap:0;margin-bottom:22px;border-bottom:1px solid var(--border);}
+.auth-tab{background:none;border:none;cursor:pointer;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;padding:10px 20px;color:var(--muted);border-bottom:2px solid transparent;transition:all .2s;margin-bottom:-1px;}
+.auth-tab.active{color:var(--purple);border-bottom-color:var(--purple);}
+.auth-err{background:rgba(230,57,70,.1);border:1px solid rgba(230,57,70,.3);border-radius:9px;padding:10px 14px;font-size:12px;color:var(--red);margin-bottom:12px;display:none;}
+.auth-err.show{display:block;}
+.auth-info{background:rgba(46,196,182,.08);border:1px solid rgba(46,196,182,.25);border-radius:9px;padding:12px 14px;font-size:12px;color:var(--teal);margin-bottom:14px;line-height:1.6;}
+.auth-sep{text-align:center;font-size:11px;color:var(--dim);margin:14px 0;}
+.user-menu{padding:18px 0 0;}
+.user-avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--blue));display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto 10px;}
+.user-email{text-align:center;font-size:13px;color:var(--muted);margin-bottom:6px;}
+.user-name{text-align:center;font-family:'Playfair Display',serif;font-size:19px;font-weight:700;margin-bottom:18px;}
+.sync-status-bar{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;margin-bottom:14px;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px;}
+
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar{width:5px;height:5px;}
 ::-webkit-scrollbar-track{background:transparent;}
@@ -355,6 +379,19 @@ nav button.active{color:var(--gold);}
   </div>
 </div>
 
+<!-- AUTH MODAL -->
+<div class="overlay" id="ov-auth" onclick="bgClose(event,'ov-auth')">
+  <div class="modal">
+    <div class="mhdr">
+      <div class="mtitle" id="auth-modal-title">Tài khoản</div>
+      <button class="mclose" onclick="closeOverlay('ov-auth')">✕</button>
+    </div>
+    <div class="mbody" id="auth-modal-body">
+      <!-- filled by JS -->
+    </div>
+  </div>
+</div>
+
 <!-- HEADER -->
 <header>
   <div class="logo">🇻🇳 <span>Ngày Lễ</span> Việt Nam</div>
@@ -363,9 +400,15 @@ nav button.active{color:var(--gold);}
     <button onclick="showPage('calendar')">📅 Lịch</button>
     <button onclick="showPage('diary')">📔 Nhật Ký</button>
   </nav>
-  <div class="header-time">
-    <strong id="live-time">--:--:--</strong>
-    <span id="live-date">--</span>
+  <div class="header-right">
+    <button class="auth-btn" id="auth-header-btn" onclick="openAuthModal()">
+      <span id="auth-sync-dot" class="sync-dot" style="display:none"></span>
+      <span id="auth-header-label">🔑 Đăng nhập</span>
+    </button>
+    <div class="header-time">
+      <strong id="live-time">--:--:--</strong>
+      <span id="live-date">--</span>
+    </div>
   </div>
 </header>
 
@@ -516,6 +559,11 @@ nav button.active{color:var(--gold);}
 
 <script>
 // ══════════════════════════════════════════════════════════
+// CONFIG — set your backend URL here
+// ══════════════════════════════════════════════════════════
+const API_URL = 'https://YOUR-BACKEND-URL.onrender.com'; // ← Change this after deploying backend
+
+// ══════════════════════════════════════════════════════════
 // LUNAR CALENDAR (full algorithm, works any year)
 // ══════════════════════════════════════════════════════════
 const LC={
@@ -525,45 +573,19 @@ const LC={
   lm11(y,tz){let k=Math.floor((this.jd(31,12,y)-2415021)/29.530588853),n=this.nm(k,tz);return this.sl(n,tz)>=9?this.nm(k-1,tz):n;},
   loff(a11,tz){let k=Math.floor((a11-2415021.076998695)/29.530588853+0.5),arc=this.sl(this.nm(k+1,tz),tz),last,i=1;do{last=arc;k++;arc=this.sl(this.nm(k+1,tz),tz);i++;}while(arc!==last&&i<14);return i-1;},
   s2l(d,m,y,tz=7){let dn=this.jd(d,m,y),k=Math.floor((dn-2415021.076998695)/29.530588853),ms=this.nm(k+1,tz);if(ms>dn)ms=this.nm(k,tz);let a11=this.lm11(y,tz),b11=a11,ly;if(a11>=ms){ly=y;a11=this.lm11(y-1,tz);}else{ly=y+1;b11=this.lm11(y+1,tz);}let ld=dn-ms+1,df=Math.floor((ms-a11)/29),ll=0,lm=df+11;if(b11-a11>365){let lo=this.loff(a11,tz);if(df>=lo){lm=df+10;if(df===lo)ll=1;}}if(lm>12)lm-=12;if(lm>=11&&df<4)ly--;return[ld,lm,ly,ll];},
-  // Find solar date from lunar date in a given solar year range
-  l2s(ld,lm,tz=7){
-    // search in current and adjacent years
-    const y=new Date().getFullYear();
-    for(let yr=y-1;yr<=y+2;yr++){
-      for(let mo=1;mo<=12;mo++){
-        const maxd=new Date(yr,mo,0).getDate();
-        for(let d=1;d<=maxd;d++){
-          const[a,b]=this.s2l(d,mo,yr,tz);
-          if(a===ld&&b===lm)return new Date(yr,mo-1,d);
-        }
-      }
-    }
-    return null;
-  },
-  l2sYear(ld,lm,yr,tz=7){
-    for(let mo=1;mo<=12;mo++){
-      const maxd=new Date(yr,mo,0).getDate();
-      for(let d=1;d<=maxd;d++){
-        const[a,b]=this.s2l(d,mo,yr,tz);
-        if(a===ld&&b===lm)return new Date(yr,mo-1,d);
-      }
-    }
-    return null;
-  }
+  l2s(ld,lm,tz=7){const y=new Date().getFullYear();for(let yr=y-1;yr<=y+2;yr++){for(let mo=1;mo<=12;mo++){const maxd=new Date(yr,mo,0).getDate();for(let d=1;d<=maxd;d++){const[a,b]=this.s2l(d,mo,yr,tz);if(a===ld&&b===lm)return new Date(yr,mo-1,d);}}}return null;},
+  l2sYear(ld,lm,yr,tz=7){for(let mo=1;mo<=12;mo++){const maxd=new Date(yr,mo,0).getDate();for(let d=1;d<=maxd;d++){const[a,b]=this.s2l(d,mo,yr,tz);if(a===ld&&b===lm)return new Date(yr,mo-1,d);}}return null;}
 };
 
 // ══════════════════════════════════════════════════════════
-// SYSTEM EVENTS — dynamic for ANY year
+// SYSTEM EVENTS
 // ══════════════════════════════════════════════════════════
-// Each definition: {id, name, tag, icon, note, getDate(year)}
 const SYS_DEFS = [
-  // ── Nghỉ lễ chính thức ──
   {id:'ny',    name:'Tết Dương Lịch',            tag:'holiday',  icon:'🎆', getDate:y=>new Date(y,0,1)},
   {id:'430',   name:'Ngày Giải Phóng 30/4',      tag:'holiday',  icon:'🎖️', getDate:y=>new Date(y,3,30)},
   {id:'may1',  name:'Quốc tế Lao Động 1/5',      tag:'holiday',  icon:'⚒️', getDate:y=>new Date(y,4,1)},
   {id:'sep2',  name:'Quốc Khánh 2/9',            tag:'holiday',  icon:'🇻🇳', getDate:y=>new Date(y,8,2)},
   {id:'hung',  name:'Giỗ Tổ Hùng Vương',         tag:'holiday',  icon:'👑', note:'10/3 Âm lịch', getDate:y=>LC.l2sYear(10,3,y)||new Date(y,3,18)},
-  // ── Tết Âm lịch ──
   {id:'giaothua', name:'Giao Thừa',              tag:'lunar',    icon:'🎇', note:'30 tháng Chạp', getDate:y=>LC.l2sYear(30,12,y-1)||LC.l2sYear(29,12,y-1)},
   {id:'tet1',  name:'Mùng 1 Tết Nguyên Đán',     tag:'lunar',    icon:'🧧', note:'Tết Nguyên Đán', getDate:y=>LC.l2sYear(1,1,y)},
   {id:'tet2',  name:'Mùng 2 Tết',                tag:'lunar',    icon:'🏮', note:'Mùng 2 tháng Giêng', getDate:y=>LC.l2sYear(2,1,y)},
@@ -575,7 +597,6 @@ const SYS_DEFS = [
   {id:'vulan', name:'Lễ Vu Lan',                 tag:'lunar',    icon:'🪷', note:'Rằm tháng 7', getDate:y=>LC.l2sYear(15,7,y)},
   {id:'trungth',name:'Tết Trung Thu',            tag:'lunar',    icon:'🥮', note:'Rằm tháng 8', getDate:y=>LC.l2sYear(15,8,y)},
   {id:'ram12', name:'Rằm tháng Chạp',            tag:'lunar',    icon:'🌕', note:'Rằm tháng 12 Âm lịch', getDate:y=>LC.l2sYear(15,12,y)},
-  // ── Dương lịch phổ biến ──
   {id:'val',   name:'Valentine',                 tag:'solar',    icon:'💝', getDate:y=>new Date(y,1,14)},
   {id:'pnqt',  name:'Ngày Phụ nữ Quốc tế 8/3',  tag:'solar',    icon:'🌸', getDate:y=>new Date(y,2,8)},
   {id:'pnvn',  name:'Ngày Phụ nữ Việt Nam 20/10',tag:'solar',    icon:'🌺', getDate:y=>new Date(y,9,20)},
@@ -586,18 +607,46 @@ const SYS_DEFS = [
   {id:'ldvn',  name:'Ngày Thành lập Đảng 3/2',   tag:'solar',    icon:'🏛️', getDate:y=>new Date(y,1,3)},
 ];
 
-// Get upcoming system events from current year onward
 function getSysForYears(fromYear, toYear){
   const evs=[];
   for(let yr=fromYear;yr<=toYear;yr++){
-    SYS_DEFS.forEach(def=>{
-      try{
-        const d=def.getDate(yr);
-        if(d&&!isNaN(d))evs.push({...def,date:d,year:yr,isSys:true});
-      }catch(e){}
-    });
+    SYS_DEFS.forEach(def=>{try{const d=def.getDate(yr);if(d&&!isNaN(d))evs.push({...def,date:d,year:yr,isSys:true});}catch(e){}}); 
   }
   return evs;
+}
+
+// ══════════════════════════════════════════════════════════
+// AUTH STATE
+// ══════════════════════════════════════════════════════════
+let authToken = localStorage.getItem('auth_token') || null;
+let authUser = JSON.parse(localStorage.getItem('auth_user') || 'null');
+let syncStatus = 'idle'; // idle | syncing | error | ok
+
+function isLoggedIn(){ return !!authToken && !!authUser; }
+
+function setSyncStatus(s){
+  syncStatus=s;
+  const dot=document.getElementById('auth-sync-dot');
+  const btn=document.getElementById('auth-header-btn');
+  if(!dot||!btn)return;
+  if(!isLoggedIn()){dot.style.display='none';btn.className='auth-btn';btn.querySelector('#auth-header-label').textContent='🔑 Đăng nhập';return;}
+  dot.style.display='inline-block';
+  dot.className='sync-dot'+(s==='syncing'?' syncing':s==='error'?' error':'');
+  btn.className='auth-btn logged';
+  const email=authUser?.email||'';
+  const short=email.split('@')[0];
+  btn.querySelector('#auth-header-label').textContent=`👤 ${short}`;
+}
+
+async function apiCall(method, path, body=null, withAuth=true){
+  const headers={'Content-Type':'application/json'};
+  if(withAuth&&authToken) headers['Authorization']=`Bearer ${authToken}`;
+  const opts={method,headers};
+  if(body) opts.body=JSON.stringify(body);
+  const r=await fetch(API_URL+path,opts);
+  const data=await r.json();
+  if(!r.ok) throw new Error(data.error||'Lỗi kết nối');
+  return data;
 }
 
 // ══════════════════════════════════════════════════════════
@@ -611,24 +660,262 @@ let calYear = new Date().getFullYear();
 let calMonth = new Date().getMonth();
 let selDate = new Date();
 let wxCache = {};
-let mainLoc = localStorage.getItem('wx_loc')||'Hanoi';
+let mainLoc = loadWxLoc();
 let editingId = null;
 let selectedMood = '';
 let moodFilter = 'all';
 
+function loadWxLoc(){ return localStorage.getItem('wx_loc')||'Hanoi'; }
+function saveWxLocLocal(loc){ localStorage.setItem('wx_loc',loc); }
 function loadCustom(){try{return JSON.parse(localStorage.getItem('vn_evts')||'[]').map(e=>({...e,date:new Date(e.date)}));}catch{return[];}}
-function saveCustom(){localStorage.setItem('vn_evts',JSON.stringify(customEvents.map(e=>({...e,date:e.date.toISOString()}))));}
+function saveCustomLocal(){localStorage.setItem('vn_evts',JSON.stringify(customEvents.map(e=>({...e,date:e.date.toISOString()}))));}
 function loadDiary(){try{return JSON.parse(localStorage.getItem('vn_diary')||'{}');}catch{return{};}}
-function saveDiaryStore(){localStorage.setItem('vn_diary',JSON.stringify(diary));}
+function saveDiaryLocal(){localStorage.setItem('vn_diary',JSON.stringify(diary));}
+
+// ── Persistent save: local + server if logged in ──
+async function saveCustom(){
+  saveCustomLocal();
+  if(isLoggedIn()){
+    try{
+      setSyncStatus('syncing');
+      await apiCall('PATCH','/api/data/events',{customEvents:customEvents.map(e=>({...e,date:e.date.toISOString()}))});
+      setSyncStatus('ok');
+    }catch(e){setSyncStatus('error');console.warn('Sync events failed:',e);}
+  }
+}
+async function saveDiaryStore(){
+  saveDiaryLocal();
+  if(isLoggedIn()){
+    try{
+      setSyncStatus('syncing');
+      await apiCall('PATCH','/api/data/diary',{diary});
+      setSyncStatus('ok');
+    }catch(e){setSyncStatus('error');console.warn('Sync diary failed:',e);}
+  }
+}
+async function saveWxLoc(loc){
+  saveWxLocLocal(loc);
+  if(isLoggedIn()){
+    try{ await apiCall('PATCH','/api/data/wxloc',{wxLoc:loc}); }catch(e){console.warn('Sync wxloc failed:',e);}
+  }
+}
+
+// ── Load data from server ──
+async function loadServerData(){
+  if(!isLoggedIn())return;
+  setSyncStatus('syncing');
+  try{
+    const d=await apiCall('GET','/api/data');
+    // Merge: server is authoritative after login
+    if(d.customEvents){
+      customEvents=d.customEvents.map(e=>({...e,date:new Date(e.date)}));
+      saveCustomLocal();
+    }
+    if(d.diary){diary=d.diary;saveDiaryLocal();}
+    if(d.wxLoc){mainLoc=d.wxLoc;saveWxLocLocal(d.wxLoc);}
+    setSyncStatus('ok');
+    rebuild();renderCountdown();renderCalendar();
+    if(document.getElementById('page-diary').classList.contains('active'))initDiary();
+    toast('✓ Dữ liệu đã đồng bộ từ máy chủ','ok');
+  }catch(e){
+    setSyncStatus('error');
+    toast('Không thể đồng bộ dữ liệu','err');
+  }
+}
+
+// ── Push local data to server (called right after first login) ──
+async function pushLocalDataToServer(){
+  try{
+    setSyncStatus('syncing');
+    // Fetch server data first to merge
+    const serverData=await apiCall('GET','/api/data');
+    // Merge custom events: combine both, deduplicate by id
+    const serverEvts=(serverData.customEvents||[]).map(e=>({...e,date:new Date(e.date)}));
+    const localEvts=customEvents;
+    const merged=[...serverEvts];
+    localEvts.forEach(le=>{if(!merged.find(se=>se.id===le.id))merged.push(le);});
+    // Merge diary: combine keys, server wins on conflict
+    const mergedDiary={...diary,...(serverData.diary||{})};
+    const mergedLoc=serverData.wxLoc||mainLoc;
+
+    // Push merged back to server
+    await apiCall('PUT','/api/data',{
+      customEvents:merged.map(e=>({...e,date:e.date.toISOString()})),
+      diary:mergedDiary,
+      wxLoc:mergedLoc
+    });
+
+    // Update local state
+    customEvents=merged;diary=mergedDiary;mainLoc=mergedLoc;
+    saveCustomLocal();saveDiaryLocal();saveWxLocLocal(mergedLoc);
+    setSyncStatus('ok');
+    rebuild();renderCountdown();renderCalendar();
+    if(document.getElementById('page-diary').classList.contains('active'))initDiary();
+    toast('✓ Dữ liệu đã được đồng bộ','ok');
+  }catch(e){
+    setSyncStatus('error');
+    toast('Lỗi đồng bộ dữ liệu','err');
+    console.error('Push local data error:',e);
+  }
+}
 
 function rebuild(){
-  const now=new Date();
-  const yr=now.getFullYear();
-  // Get system events for current year + next year (enough for countdown)
+  const now=new Date();const yr=now.getFullYear();
   const sys=getSysForYears(yr,yr+1);
   allEvents=[...sys,...customEvents].filter(e=>e.date&&!isNaN(e.date)).sort((a,b)=>a.date-b.date);
   const el=document.getElementById('ev-year-label');
   if(el)el.textContent=`${yr}–${yr+1}`;
+}
+
+// ══════════════════════════════════════════════════════════
+// AUTH MODAL
+// ══════════════════════════════════════════════════════════
+function openAuthModal(){
+  renderAuthModal();
+  openOverlay('ov-auth');
+}
+
+function renderAuthModal(){
+  const body=document.getElementById('auth-modal-body');
+  if(isLoggedIn()){
+    document.getElementById('auth-modal-title').textContent='Tài khoản';
+    body.innerHTML=`
+      <div class="user-menu">
+        <div class="user-avatar">👤</div>
+        <div class="user-name">Xin chào!</div>
+        <div class="user-email">${authUser.email}</div>
+        <div class="sync-status-bar">
+          <span class="sync-dot ${syncStatus==='syncing'?'syncing':syncStatus==='error'?'error':''}"></span>
+          <span>${syncStatus==='syncing'?'Đang đồng bộ...':syncStatus==='error'?'Lỗi đồng bộ':'Đã đồng bộ'}</span>
+          <button class="wxb-btn" style="margin-left:auto;padding:4px 10px;font-size:11px;" onclick="loadServerData()">🔄 Tải lại</button>
+        </div>
+        <div style="margin-bottom:14px;font-size:12px;color:var(--muted);">Dữ liệu được tự động đồng bộ giữa các thiết bị khi bạn đăng nhập.</div>
+        <div id="cpw-section">
+          <div class="flabel" style="margin-bottom:10px;">Đổi mật khẩu</div>
+          <div class="fgroup"><input type="password" class="finp" id="cp-old" placeholder="Mật khẩu hiện tại"></div>
+          <div class="fgroup"><input type="password" class="finp" id="cp-new" placeholder="Mật khẩu mới (ít nhất 6 ký tự)"></div>
+          <div class="auth-err" id="cp-err"></div>
+          <button class="btn-s" style="width:100%;margin-bottom:8px;" onclick="changePassword()">Đổi mật khẩu</button>
+        </div>
+        <div class="mact-row">
+          <button class="btn-s" onclick="closeOverlay('ov-auth')">Đóng</button>
+          <button class="btn-danger" onclick="logout()">🚪 Đăng xuất</button>
+        </div>
+      </div>`;
+    return;
+  }
+  document.getElementById('auth-modal-title').textContent='Đăng nhập / Đăng ký';
+  body.innerHTML=`
+    <div class="auth-info">🔒 Đăng nhập để dữ liệu được lưu trên máy chủ và đồng bộ giữa các thiết bị. Nếu không đăng nhập, dữ liệu vẫn được lưu trên trình duyệt này.</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Đăng nhập</button>
+      <button class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">Đăng ký</button>
+    </div>
+    <div id="auth-login-form">
+      <div class="fgroup"><label class="flabel">Email</label><input type="email" class="finp" id="login-email" placeholder="your@email.com" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="fgroup"><label class="flabel">Mật khẩu</label><input type="password" class="finp" id="login-pw" placeholder="Mật khẩu" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="auth-err" id="login-err"></div>
+      <button class="btn-p" style="width:100%;" onclick="doLogin()">Đăng nhập</button>
+    </div>
+    <div id="auth-register-form" style="display:none;">
+      <div class="fgroup"><label class="flabel">Email</label><input type="email" class="finp" id="reg-email" placeholder="your@email.com"></div>
+      <div class="fgroup"><label class="flabel">Mật khẩu</label><input type="password" class="finp" id="reg-pw" placeholder="Ít nhất 6 ký tự" onkeydown="if(event.key==='Enter')doRegister()"></div>
+      <div class="auth-err" id="reg-err"></div>
+      <button class="btn-p" style="width:100%;" onclick="doRegister()">Tạo tài khoản</button>
+    </div>`;
+}
+
+function switchAuthTab(tab){
+  document.getElementById('tab-login').classList.toggle('active',tab==='login');
+  document.getElementById('tab-register').classList.toggle('active',tab==='register');
+  document.getElementById('auth-login-form').style.display=tab==='login'?'':'none';
+  document.getElementById('auth-register-form').style.display=tab==='register'?'':'none';
+}
+
+async function doLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const pw=document.getElementById('login-pw').value;
+  const errEl=document.getElementById('login-err');
+  errEl.classList.remove('show');
+  if(!email||!pw){errEl.textContent='Vui lòng điền đầy đủ';errEl.classList.add('show');return;}
+  const btn=document.querySelector('#auth-login-form .btn-p');
+  btn.textContent='Đang đăng nhập...';btn.disabled=true;
+  try{
+    const d=await apiCall('POST','/api/auth/login',{email,password:pw},false);
+    authToken=d.token;authUser=d.user;
+    localStorage.setItem('auth_token',authToken);
+    localStorage.setItem('auth_user',JSON.stringify(authUser));
+    closeOverlay('ov-auth');
+    setSyncStatus('idle');
+    toast(`✓ Chào mừng ${authUser.email.split('@')[0]}!`,'ok');
+    await pushLocalDataToServer();
+    renderAuthModal();
+  }catch(e){
+    errEl.textContent=e.message;errEl.classList.add('show');
+    btn.textContent='Đăng nhập';btn.disabled=false;
+  }
+}
+
+async function doRegister(){
+  const email=document.getElementById('reg-email').value.trim();
+  const pw=document.getElementById('reg-pw').value;
+  const errEl=document.getElementById('reg-err');
+  errEl.classList.remove('show');
+  if(!email||!pw){errEl.textContent='Vui lòng điền đầy đủ';errEl.classList.add('show');return;}
+  const btn=document.querySelector('#auth-register-form .btn-p');
+  btn.textContent='Đang tạo tài khoản...';btn.disabled=true;
+  try{
+    const d=await apiCall('POST','/api/auth/register',{email,password:pw},false);
+    authToken=d.token;authUser=d.user;
+    localStorage.setItem('auth_token',authToken);
+    localStorage.setItem('auth_user',JSON.stringify(authUser));
+    closeOverlay('ov-auth');
+    setSyncStatus('idle');
+    toast(`✓ Đã tạo tài khoản thành công!`,'ok');
+    await pushLocalDataToServer();
+    renderAuthModal();
+  }catch(e){
+    errEl.textContent=e.message;errEl.classList.add('show');
+    btn.textContent='Tạo tài khoản';btn.disabled=false;
+  }
+}
+
+async function changePassword(){
+  const old=document.getElementById('cp-old').value;
+  const nw=document.getElementById('cp-new').value;
+  const errEl=document.getElementById('cp-err');
+  errEl.classList.remove('show');
+  if(!old||!nw){errEl.textContent='Vui lòng điền đầy đủ';errEl.classList.add('show');return;}
+  try{
+    await apiCall('POST','/api/auth/change-password',{currentPassword:old,newPassword:nw});
+    document.getElementById('cp-old').value='';document.getElementById('cp-new').value='';
+    toast('✓ Đổi mật khẩu thành công','ok');
+  }catch(e){errEl.textContent=e.message;errEl.classList.add('show');}
+}
+
+function logout(){
+  authToken=null;authUser=null;
+  localStorage.removeItem('auth_token');localStorage.removeItem('auth_user');
+  setSyncStatus('idle');
+  closeOverlay('ov-auth');
+  toast('Đã đăng xuất','ok');
+  renderAuthModal();
+}
+
+// ── Verify token on load ──
+async function verifyToken(){
+  if(!authToken)return;
+  try{
+    const d=await apiCall('GET','/api/auth/me');
+    authUser=d.user;localStorage.setItem('auth_user',JSON.stringify(authUser));
+    setSyncStatus('ok');
+    await loadServerData();
+  }catch(e){
+    // Token expired or invalid
+    authToken=null;authUser=null;
+    localStorage.removeItem('auth_token');localStorage.removeItem('auth_user');
+    setSyncStatus('idle');
+  }
 }
 
 // ══════════════════════════════════════════════════════════
@@ -637,11 +924,9 @@ function rebuild(){
 function wxIcon(c){if(c===113)return'☀️';if(c===116)return'⛅';if(c===119||c===122)return'☁️';if(c>=143&&c<=185)return'🌫️';if(c>=200&&c<=260)return'❄️';if(c>=263&&c<=296)return'🌧️';if(c>=299&&c<=395)return'⛈️';return'🌤️';}
 
 async function fetchWx(loc){
-  const k=loc.toLowerCase().trim();
-  const c=wxCache[k];if(c&&Date.now()-c.ts<15*60*1000)return c.d;
+  const k=loc.toLowerCase().trim();const c=wxCache[k];if(c&&Date.now()-c.ts<15*60*1000)return c.d;
   try{
-    const r=await fetch(`https://wttr.in/${encodeURIComponent(loc)}?format=j1`);
-    if(!r.ok)return null;
+    const r=await fetch(`https://wttr.in/${encodeURIComponent(loc)}?format=j1`);if(!r.ok)return null;
     const j=await r.json();const cc=j.current_condition[0];
     const d={temp:parseInt(cc.temp_C),feels:parseInt(cc.FeelsLikeC),hum:parseInt(cc.humidity),wind:parseInt(cc.windspeedKmph),desc:cc.weatherDesc[0].value,icon:wxIcon(parseInt(cc.weatherCode)),city:j.nearest_area[0].areaName[0].value+', '+j.nearest_area[0].country[0].value};
     wxCache[k]={d,ts:Date.now()};return d;
@@ -650,25 +935,16 @@ async function fetchWx(loc){
 
 async function loadMainWx(){
   const d=await fetchWx(mainLoc);if(!d)return;
-  document.getElementById('wxb-icon').textContent=d.icon;
-  document.getElementById('wxb-temp').textContent=`${d.temp}°C`;
-  document.getElementById('wxb-desc').textContent=d.desc;
-  document.getElementById('wxb-city').textContent=d.city;
-  document.getElementById('wxb-hum').textContent=`💧 ${d.hum}%`;
-  document.getElementById('wxb-wind').textContent=`💨 ${d.wind}km/h`;
-  document.getElementById('wxb-feels').textContent=`🌡️ Cảm giác ${d.feels}°C`;
-  const n=new Date();document.getElementById('wxb-upd').textContent=`Cập nhật ${n.getHours()}:${pz(n.getMinutes())}`;
-  document.getElementById('wxb-hint').textContent=`📍 ${d.city}`;
-  // featured
-  const fw=document.getElementById('feat-wx');
-  fw.innerHTML=`<span class="feat-wx-icon">${d.icon}</span><div class="feat-wx-temp">${d.temp}°C</div><div class="feat-wx-city">${d.city.split(',')[0]}</div>`;
+  document.getElementById('wxb-icon').textContent=d.icon;document.getElementById('wxb-temp').textContent=`${d.temp}°C`;document.getElementById('wxb-desc').textContent=d.desc;document.getElementById('wxb-city').textContent=d.city;document.getElementById('wxb-hum').textContent=`💧 ${d.hum}%`;document.getElementById('wxb-wind').textContent=`💨 ${d.wind}km/h`;document.getElementById('wxb-feels').textContent=`🌡️ Cảm giác ${d.feels}°C`;
+  const n=new Date();document.getElementById('wxb-upd').textContent=`Cập nhật ${n.getHours()}:${pz(n.getMinutes())}`;document.getElementById('wxb-hint').textContent=`📍 ${d.city}`;
+  const fw=document.getElementById('feat-wx');fw.innerHTML=`<span class="feat-wx-icon">${d.icon}</span><div class="feat-wx-temp">${d.temp}°C</div><div class="feat-wx-city">${d.city.split(',')[0]}</div>`;
 }
 
 async function changeMainWx(){
   const loc=document.getElementById('wxb-loc').value.trim();if(!loc){toast('Nhập địa điểm','err');return;}
   document.getElementById('wxb-hint').textContent='⏳ Đang tải...';
   const d=await fetchWx(loc);if(!d){toast('Không tìm thấy địa điểm','err');document.getElementById('wxb-hint').textContent='';return;}
-  mainLoc=loc;localStorage.setItem('wx_loc',loc);document.getElementById('wxb-loc').value='';
+  mainLoc=loc;await saveWxLoc(loc);document.getElementById('wxb-loc').value='';
   loadMainWx();toast(`✓ Chuyển sang ${d.city}`,'ok');
 }
 
@@ -688,34 +964,25 @@ function openForm(ds){
   editingId=null;
   document.getElementById('form-title').textContent='Thêm sự kiện cá nhân';
   document.getElementById('form-save').textContent='Thêm sự kiện';
-  document.getElementById('f-id').value='';
-  document.getElementById('f-name').value='';
-  document.getElementById('f-date').value=ds||tStr();
-  document.getElementById('f-icon').value='⭐';
-  document.getElementById('f-loc').value='';
-  document.getElementById('f-note').value='';
+  document.getElementById('f-id').value='';document.getElementById('f-name').value='';
+  document.getElementById('f-date').value=ds||tStr();document.getElementById('f-icon').value='⭐';
+  document.getElementById('f-loc').value='';document.getElementById('f-note').value='';
   document.getElementById('loc-prev').style.display='none';
-  openOverlay('ov-form');
-  setTimeout(()=>document.getElementById('f-name').focus(),200);
+  openOverlay('ov-form');setTimeout(()=>document.getElementById('f-name').focus(),200);
 }
 
 function openEditForm(id){
   const ev=customEvents.find(e=>e.id===id);if(!ev)return;
   editingId=id;
-  document.getElementById('form-title').textContent='Sửa sự kiện';
-  document.getElementById('form-save').textContent='Lưu thay đổi';
-  document.getElementById('f-id').value=id;
-  document.getElementById('f-name').value=ev.name;
+  document.getElementById('form-title').textContent='Sửa sự kiện';document.getElementById('form-save').textContent='Lưu thay đổi';
+  document.getElementById('f-id').value=id;document.getElementById('f-name').value=ev.name;
   const d=ev.date;document.getElementById('f-date').value=`${d.getFullYear()}-${pz(d.getMonth()+1)}-${pz(d.getDate())}`;
-  document.getElementById('f-icon').value=ev.icon||'⭐';
-  document.getElementById('f-loc').value=ev.location||'';
-  document.getElementById('f-note').value=ev.note||'';
+  document.getElementById('f-icon').value=ev.icon||'⭐';document.getElementById('f-loc').value=ev.location||'';document.getElementById('f-note').value=ev.note||'';
   document.getElementById('loc-prev').style.display='none';
-  openOverlay('ov-form');
-  if(ev.location)prevLocWx();
+  openOverlay('ov-form');if(ev.location)prevLocWx();
 }
 
-function saveEvent(){
+async function saveEvent(){
   const name=document.getElementById('f-name').value.trim();
   const dateVal=document.getElementById('f-date').value;
   const icon=document.getElementById('f-icon').value.trim()||'⭐';
@@ -732,40 +999,22 @@ function saveEvent(){
     customEvents.push({id:'ev_'+Date.now(),name,tag:'personal',icon,location:loc,note,date});
     toast('✓ Đã thêm sự kiện','ok');
   }
-  saveCustom();closeOverlay('ov-form');refreshAll();
+  await saveCustom();closeOverlay('ov-form');refreshAll();
 }
 
 // ══════════════════════════════════════════════════════════
 // DETAIL MODAL
 // ══════════════════════════════════════════════════════════
 async function showDetail(ev){
-  const isCustom=!!ev.id;
-  const cd=getDiff(ev.date);
-  const isPast=!cd;
-  const tagCls=ev.tag;
+  if(!ev)return;
+  const isCustom=!!ev.id;const cd=getDiff(ev.date);const isPast=!cd;const tagCls=ev.tag;
   const[ld,lm,ly]=LC.s2l(ev.date.getDate(),ev.date.getMonth()+1,ev.date.getFullYear());
   const lunarStr=`${ld}/${lm}/${ly} Âm lịch`;
-
-  let cdHtml=isPast
-    ?`<div style="font-size:13px;color:var(--muted);font-style:italic;">✓ Sự kiện này đã qua</div>`
-    :`<div class="dh-cd">
-        <div class="dh-unit"><span class="dh-num">${pz(cd.d)}</span><span class="dh-lbl">Ngày</span></div>
-        <div class="dh-unit"><span class="dh-num">${pz(cd.h)}</span><span class="dh-lbl">Giờ</span></div>
-        <div class="dh-unit"><span class="dh-num">${pz(cd.m)}</span><span class="dh-lbl">Phút</span></div>
-        <div class="dh-unit"><span class="dh-num">${pz(cd.s)}</span><span class="dh-lbl">Giây</span></div>
-      </div>`;
-
-  const actHtml=isCustom
-    ?`<div class="dact-row">
-        <button class="btn-s" onclick="closeOverlay('ov-detail');openEditForm('${ev.id}')">✏️ Sửa sự kiện</button>
-        <button class="btn-danger" onclick="closeOverlay('ov-detail');askDel('${ev.id}')">🗑️ Xoá</button>
-      </div>`:'';
-
-  const wxHtml=ev.location
-    ?`<div class="detail-section"><div class="detail-section-title">Thời tiết tại địa điểm</div><div class="detail-wx-box" id="detail-wx-box"><span style="font-size:14px;color:var(--muted);animation:pulse 1.5s infinite">⏳ Đang tải thời tiết...</span></div></div>`:'';
-
+  let cdHtml=isPast?`<div style="font-size:13px;color:var(--muted);font-style:italic;">✓ Sự kiện này đã qua</div>`
+    :`<div class="dh-cd"><div class="dh-unit"><span class="dh-num">${pz(cd.d)}</span><span class="dh-lbl">Ngày</span></div><div class="dh-unit"><span class="dh-num">${pz(cd.h)}</span><span class="dh-lbl">Giờ</span></div><div class="dh-unit"><span class="dh-num">${pz(cd.m)}</span><span class="dh-lbl">Phút</span></div><div class="dh-unit"><span class="dh-num">${pz(cd.s)}</span><span class="dh-lbl">Giây</span></div></div>`;
+  const actHtml=isCustom?`<div class="dact-row"><button class="btn-s" onclick="closeOverlay('ov-detail');openEditForm('${ev.id}')">✏️ Sửa sự kiện</button><button class="btn-danger" onclick="closeOverlay('ov-detail');askDel('${ev.id}')">🗑️ Xoá</button></div>`:'';
+  const wxHtml=ev.location?`<div class="detail-section"><div class="detail-section-title">Thời tiết tại địa điểm</div><div class="detail-wx-box" id="detail-wx-box"><span style="font-size:14px;color:var(--muted);animation:pulse 1.5s infinite">⏳ Đang tải thời tiết...</span></div></div>`:'';
   const noteHtml=ev.note?`<div class="detail-section"><div class="detail-section-title">Ghi chú</div><div class="detail-note">${ev.note}</div></div>`:'';
-
   document.getElementById('detail-body').innerHTML=`
     <div class="detail-hero ${tagCls}">
       <span class="dh-icon">${ev.icon||'📅'}</span>
@@ -780,34 +1029,20 @@ async function showDetail(ev){
       <div class="detail-row"><span class="detail-row-icon">${ev.tag==='solar'?'☀️':ev.tag==='lunar'?'🌙':ev.tag==='holiday'?'🏖️':'⭐'}</span><div class="detail-row-val">${tagLabel(ev.tag)}</div></div>
       ${ev.location?`<div class="detail-row"><span class="detail-row-icon">📍</span><div class="detail-row-val">${ev.location}</div></div>`:''}
     </div>
-    ${wxHtml}
-    ${noteHtml}
-    ${actHtml}
-  `;
+    ${wxHtml}${noteHtml}${actHtml}`;
   openOverlay('ov-detail');
-
-  // Start live countdown update
   if(!isPast){
     const timer=setInterval(()=>{
-      const el=document.getElementById('ov-detail');
-      if(!el||!el.classList.contains('open')){clearInterval(timer);return;}
+      const el=document.getElementById('ov-detail');if(!el||!el.classList.contains('open')){clearInterval(timer);return;}
       const c=getDiff(ev.date);if(!c){clearInterval(timer);return;}
       const units=document.querySelectorAll('#detail-body .dh-num');
-      if(units[0])units[0].textContent=pz(c.d);
-      if(units[1])units[1].textContent=pz(c.h);
-      if(units[2])units[2].textContent=pz(c.m);
-      if(units[3])units[3].textContent=pz(c.s);
+      if(units[0])units[0].textContent=pz(c.d);if(units[1])units[1].textContent=pz(c.h);if(units[2])units[2].textContent=pz(c.m);if(units[3])units[3].textContent=pz(c.s);
     },1000);
   }
-
-  // Load weather
   if(ev.location){
-    const d=await fetchWx(ev.location);
-    const wb=document.getElementById('detail-wx-box');
-    if(wb){
-      if(!d){wb.innerHTML='<span style="font-size:13px;color:var(--muted);">Không lấy được thời tiết</span>';return;}
-      wb.innerHTML=`<span class="dwx-icon">${d.icon}</span><div><div class="dwx-temp">${d.temp}°C</div><div class="dwx-info">${d.desc} · Độ ẩm ${d.hum}% · Gió ${d.wind}km/h<br>📍 ${d.city}</div></div>`;
-    }
+    const d=await fetchWx(ev.location);const wb=document.getElementById('detail-wx-box');
+    if(wb){if(!d){wb.innerHTML='<span style="font-size:13px;color:var(--muted);">Không lấy được thời tiết</span>';return;}
+      wb.innerHTML=`<span class="dwx-icon">${d.icon}</span><div><div class="dwx-temp">${d.temp}°C</div><div class="dwx-info">${d.desc} · Độ ẩm ${d.hum}% · Gió ${d.wind}km/h<br>📍 ${d.city}</div></div>`;}
   }
 }
 
@@ -819,25 +1054,16 @@ function getDiff(date){const df=date-new Date();if(df<0)return null;return{d:Mat
 function tagLabel(t){return{solar:'Dương lịch',lunar:'Âm lịch',holiday:'Nghỉ lễ',personal:'Cá nhân'}[t]||t;}
 
 function renderCountdown(){
-  const now=new Date();
-  const filtered=allEvents.filter(e=>curFilter==='all'||e.tag===curFilter);
+  const now=new Date();const filtered=allEvents.filter(e=>curFilter==='all'||e.tag===curFilter);
   const up=filtered.filter(e=>e.date>now).sort((a,b)=>a.date-b.date);
   const past=filtered.filter(e=>e.date<=now).sort((a,b)=>b.date-a.date);
-  // Featured
-  if(up.length){
-    const f=up[0],c=getDiff(f.date);
-    document.getElementById('feat-name').textContent=(f.icon?f.icon+' ':'')+f.name;
-    document.getElementById('feat-sub').textContent=f.date.toLocaleDateString('vi-VN',{weekday:'long',year:'numeric',month:'long',day:'numeric'})+(f.note?' · '+f.note:'');
-    if(c)['d','h','m','s'].forEach(k=>document.getElementById('cd-'+k).textContent=pz(c[k]));
-  }
-  // Grid
+  if(up.length){const f=up[0],c=getDiff(f.date);document.getElementById('feat-name').textContent=(f.icon?f.icon+' ':'')+f.name;document.getElementById('feat-sub').textContent=f.date.toLocaleDateString('vi-VN',{weekday:'long',year:'numeric',month:'long',day:'numeric'})+(f.note?' · '+f.note:'');if(c)['d','h','m','s'].forEach(k=>document.getElementById('cd-'+k).textContent=pz(c[k]));}
   const grid=document.getElementById('evgrid');grid.innerHTML='';
   const CLRS={solar:'var(--sol)',lunar:'var(--lun)',holiday:'var(--hol)',personal:'var(--per)'};
   [...up,...past].forEach((ev,i)=>{
     const c=getDiff(ev.date),isPast=!c,isCustom=!!ev.id;
     const card=document.createElement('div');
-    card.className='ecard'+(isPast?' passed':'');card.setAttribute('data-tag',ev.tag);
-    card.onclick=()=>showDetail(ev);
+    card.className='ecard'+(isPast?' passed':'');card.setAttribute('data-tag',ev.tag);card.onclick=()=>showDetail(ev);
     const acts=isCustom?`<div class="card-acts"><button class="cact edit" onclick="event.stopPropagation();openEditForm('${ev.id}')">✏️</button><button class="cact del" onclick="event.stopPropagation();askDel('${ev.id}')">🗑️</button></div>`:'';
     const locH=ev.location?`<div class="eloc">📍 ${ev.location}</div>`:'';
     const wxH=ev.location?`<div class="ewx-row" id="ewx-${ev.id||'s'+i}"><span class="ewx-icon" style="animation:pulse 1.5s infinite">⏳</span><span style="font-size:11px;color:var(--muted)">Đang tải...</span></div>`:'';
@@ -849,17 +1075,13 @@ function renderCountdown(){
 }
 
 function updateFeatCd(){
-  const now=new Date();
-  const up=allEvents.filter(e=>e.date>now&&(curFilter==='all'||e.tag===curFilter)).sort((a,b)=>a.date-b.date);
-  if(!up.length)return;const c=getDiff(up[0].date);
-  if(c)['d','h','m','s'].forEach(k=>document.getElementById('cd-'+k).textContent=pz(c[k]));
+  const now=new Date();const up=allEvents.filter(e=>e.date>now&&(curFilter==='all'||e.tag===curFilter)).sort((a,b)=>a.date-b.date);
+  if(!up.length)return;const c=getDiff(up[0].date);if(c)['d','h','m','s'].forEach(k=>document.getElementById('cd-'+k).textContent=pz(c[k]));
 }
 
 function fTag(tag){
-  curFilter=tag;
-  document.querySelectorAll('.tb').forEach(b=>b.classList.remove('act'));
-  const t=document.querySelector(`.tb[data-tag="${tag}"]`);if(t)t.classList.add('act');
-  renderCountdown();
+  curFilter=tag;document.querySelectorAll('.tb').forEach(b=>b.classList.remove('act'));
+  const t=document.querySelector(`.tb[data-tag="${tag}"]`);if(t)t.classList.add('act');renderCountdown();
 }
 
 // ══════════════════════════════════════════════════════════
@@ -871,25 +1093,20 @@ const CLRS={solar:'var(--sol)',lunar:'var(--lun)',holiday:'var(--hol)',personal:
 function evOn(date){return allEvents.filter(e=>{const d=e.date;return d.getFullYear()===date.getFullYear()&&d.getMonth()===date.getMonth()&&d.getDate()===date.getDate();});}
 
 function renderCalendar(){
-  // Rebuild events for calendar year so we see this year's holidays
   const sysForCal=getSysForYears(calYear,calYear+1);
   const calEvs=[...sysForCal,...customEvents].filter(e=>e.date&&!isNaN(e.date));
   const getEvOnCal=(date)=>calEvs.filter(e=>{const d=e.date;return d.getFullYear()===date.getFullYear()&&d.getMonth()===date.getMonth()&&d.getDate()===date.getDate();});
   const now=new Date();
   document.getElementById('cal-title').textContent=`${MONTHS[calMonth]}, ${calYear}`;
   const grid=document.getElementById('calgrid');grid.innerHTML='';
-  const first=new Date(calYear,calMonth,1).getDay();
-  const days=new Date(calYear,calMonth+1,0).getDate();
-  const prev=new Date(calYear,calMonth,0).getDate();
+  const first=new Date(calYear,calMonth,1).getDay();const days=new Date(calYear,calMonth+1,0).getDate();const prev=new Date(calYear,calMonth,0).getDate();
   const mkC=(date,other)=>{
     const cell=document.createElement('div');
     cell.className='cday'+(other?' other':'')+(date.toDateString()===now.toDateString()?' today':'')+(date.toDateString()===selDate.toDateString()?' sel':'')+(date.getDay()===0?' sun':'');
-    const evs=getEvOnCal(date);
-    const[ld,lm]=LC.s2l(date.getDate(),date.getMonth()+1,date.getFullYear());
-    const hasDiary=diary[dKey(date)]?'●':'' ;
+    const evs=getEvOnCal(date);const[ld,lm]=LC.s2l(date.getDate(),date.getMonth()+1,date.getFullYear());
+    const hasDiary=diary[dKey(date)]?'●':'';
     cell.innerHTML=`<div class="cday-num">${date.getDate()}</div><div class="cday-lun">${ld}/${lm}${hasDiary?' 📝':''}</div>${evs.length?`<div class="cdots">${evs.map(e=>`<span class="cdot cdot-${e.tag}"></span>`).join('')}</div>`:''}`;
-    cell.onclick=()=>pickDate(date,calEvs);
-    return cell;
+    cell.onclick=()=>pickDate(date,calEvs);return cell;
   };
   for(let i=first-1;i>=0;i--)grid.appendChild(mkC(new Date(calYear,calMonth-1,prev-i),true));
   for(let d=1;d<=days;d++)grid.appendChild(mkC(new Date(calYear,calMonth,d),false));
@@ -903,69 +1120,38 @@ function pickDate(date,calEvs){
   document.getElementById('sel-lun').textContent=`🌙 ${ld}/${lm}${ll?'(nhuận)':''}/${ly} Âm lịch`;
   const evs=calEvs.filter(e=>{const d=e.date;return d.getFullYear()===date.getFullYear()&&d.getMonth()===date.getMonth()&&d.getDate()===date.getDate();});
   const list=document.getElementById('dev-list');
-  // Check diary
   const dk=dKey(date);const de=diary[dk];
-  const diaryHtml=de?`<div class="dev-item" onclick="showDiaryEntry('${dk}')" style="border-color:rgba(155,114,207,.3);">
-    <span class="dev-dot" style="background:var(--per)"></span>
-    <div><div class="dev-name">${de.mood||''} Nhật ký</div><div class="dev-meta">${(de.text||'').slice(0,40)}${(de.text||'').length>40?'...':''}</div></div>
-  </div>`:'';
+  const diaryHtml=de?`<div class="dev-item" onclick="showDiaryEntry('${dk}')" style="border-color:rgba(155,114,207,.3);"><span class="dev-dot" style="background:var(--per)"></span><div><div class="dev-name">${de.mood||''} Nhật ký</div><div class="dev-meta">${(de.text||'').slice(0,40)}${(de.text||'').length>40?'...':''}</div></div></div>`:'';
   if(!evs.length&&!diaryHtml){list.innerHTML='<div class="no-ev">Không có sự kiện</div>';return;}
-  list.innerHTML=diaryHtml+evs.map(ev=>`
-    <div class="dev-item" onclick="showDetail(allEvents.find(e=>e.id==='${ev.id||''}'))||showSysDetail('${ev.id}',${calYear})">
-      <span class="dev-dot" style="background:${CLRS[ev.tag]}"></span>
-      <div style="flex:1;min-width:0;">
-        <div class="dev-name">${ev.icon||''} ${ev.name}</div>
-        <div class="dev-meta">${tagLabel(ev.tag)}${ev.note?' · '+ev.note:''}</div>
-      </div>
-      ${ev.id?`<div style="display:flex;gap:3px;flex-shrink:0;"><button class="cact edit" onclick="event.stopPropagation();openEditForm('${ev.id}')">✏️</button><button class="cact del" onclick="event.stopPropagation();askDel('${ev.id}')">🗑️</button></div>`:''}
-    </div>`).join('');
+  list.innerHTML=diaryHtml+evs.map(ev=>`<div class="dev-item" onclick="showDetail(allEvents.find(e=>e.id==='${ev.id||''}'))||showSysDetail('${ev.id}',${calYear})"><span class="dev-dot" style="background:${CLRS[ev.tag]}"></span><div style="flex:1;min-width:0;"><div class="dev-name">${ev.icon||''} ${ev.name}</div><div class="dev-meta">${tagLabel(ev.tag)}${ev.note?' · '+ev.note:''}</div></div>${ev.id?`<div style="display:flex;gap:3px;flex-shrink:0;"><button class="cact edit" onclick="event.stopPropagation();openEditForm('${ev.id}')">✏️</button><button class="cact del" onclick="event.stopPropagation();askDel('${ev.id}')">🗑️</button></div>`:''}</div>`).join('');
 }
 
-function showSysDetail(id,yr){
-  const def=SYS_DEFS.find(d=>d.id===id);if(!def)return;
-  try{const d=def.getDate(yr);if(d)showDetail({...def,date:d,isSys:true});}catch(e){}
-}
-
-function calNav(d){
-  if(!d){calYear=new Date().getFullYear();calMonth=new Date().getMonth();}
-  else{calMonth+=d;if(calMonth<0){calMonth=11;calYear--;}if(calMonth>11){calMonth=0;calYear++;}}
-  renderCalendar();
-}
-
+function showSysDetail(id,yr){const def=SYS_DEFS.find(d=>d.id===id);if(!def)return;try{const d=def.getDate(yr);if(d)showDetail({...def,date:d,isSys:true});}catch(e){}}
+function calNav(d){if(!d){calYear=new Date().getFullYear();calMonth=new Date().getMonth();}else{calMonth+=d;if(calMonth<0){calMonth=11;calYear--;}if(calMonth>11){calMonth=0;calYear++;}}renderCalendar();}
 function selDS(){const d=selDate;return`${d.getFullYear()}-${pz(d.getMonth()+1)}-${pz(d.getDate())}`;}
 
 // ══════════════════════════════════════════════════════════
 // DIARY
 // ══════════════════════════════════════════════════════════
-const MOODS=['😊','🥰','😎','🤔','😌','😔','😤','😩','🤒','🥳','😴','🤩'];
 function dKey(date){const d=date instanceof Date?date:new Date(date);return`${d.getFullYear()}-${pz(d.getMonth()+1)}-${pz(d.getDate())}`;}
 const TODAY_KEY=dKey(new Date());
 
 function initDiary(){
-  const now=new Date();
-  const[ld,lm,ly]=LC.s2l(now.getDate(),now.getMonth()+1,now.getFullYear());
+  const now=new Date();const[ld,lm,ly]=LC.s2l(now.getDate(),now.getMonth()+1,now.getFullYear());
   document.getElementById('diary-today-date').textContent=now.toLocaleDateString('vi-VN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   document.getElementById('diary-today-lun').textContent=`🌙 ${ld}/${lm}/${ly} Âm lịch`;
-  // Load today's entry
   const e=diary[TODAY_KEY];
   if(e){
     document.getElementById('diary-text').value=e.text||'';
-    if(e.mood){
-      selectedMood=e.mood;
-      document.querySelectorAll('.mood-btn').forEach(b=>{b.classList.toggle('sel',b.getAttribute('data-mood')===e.mood);});
-      document.getElementById('diary-today-mood-show').textContent=e.mood;
-    }
+    if(e.mood){selectedMood=e.mood;document.querySelectorAll('.mood-btn').forEach(b=>{b.classList.toggle('sel',b.getAttribute('data-mood')===e.mood);});document.getElementById('diary-today-mood-show').textContent=e.mood;}
     document.getElementById('diary-chars').textContent=`${(e.text||'').length} ký tự`;
   }
-  renderDiaryStats();
-  renderMoodFilterBar();
-  renderDiaryList();
+  renderDiaryStats();renderMoodFilterBar();renderDiaryList();
 }
 
 function pickMood(btn){
   selectedMood=btn.getAttribute('data-mood');
-  document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('sel'));
-  btn.classList.add('sel');
+  document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');
   document.getElementById('diary-today-mood-show').textContent=selectedMood;
 }
 
@@ -973,15 +1159,14 @@ function onDiaryInput(){
   const t=document.getElementById('diary-text').value;
   document.getElementById('diary-chars').textContent=`${t.length} ký tự`;
   document.getElementById('diary-saved').classList.remove('show');
-  clearTimeout(window._autoSave);
-  window._autoSave=setTimeout(()=>saveDiary(true),2000);
+  clearTimeout(window._autoSave);window._autoSave=setTimeout(()=>saveDiary(true),2000);
 }
 
-function saveDiary(auto=false){
+async function saveDiary(auto=false){
   const text=document.getElementById('diary-text').value.trim();
   if(!text&&!selectedMood)return;
   diary[TODAY_KEY]={text,mood:selectedMood,ts:Date.now()};
-  saveDiaryStore();
+  await saveDiaryStore();
   if(!auto){toast('✓ Đã lưu nhật ký hôm nay','ok');}
   document.getElementById('diary-saved').classList.add('show');
   setTimeout(()=>document.getElementById('diary-saved').classList.remove('show'),2500);
@@ -989,29 +1174,17 @@ function saveDiary(auto=false){
 }
 
 function renderDiaryStats(){
-  const keys=Object.keys(diary);
-  const total=keys.length;
+  const keys=Object.keys(diary);const total=keys.length;
   const moodCounts={};keys.forEach(k=>{const m=diary[k].mood;if(m)moodCounts[m]=(moodCounts[m]||0)+1;});
-  const topMood=Object.entries(moodCounts).sort((a,b)=>b[1]-a[1])[0];
-  const streak=calcStreak();
-  document.getElementById('diary-stats').innerHTML=`
-    <div class="dstat"><div class="dstat-num">${total}</div><div class="dstat-lbl">Trang nhật ký</div></div>
-    <div class="dstat"><div class="dstat-num">${streak}</div><div class="dstat-lbl">Ngày liên tiếp</div></div>
-    <div class="dstat"><div class="dstat-num" style="font-size:22px;">${topMood?topMood[0]:'--'}</div><div class="dstat-lbl">Tâm trạng chủ đạo</div></div>
-  `;
+  const topMood=Object.entries(moodCounts).sort((a,b)=>b[1]-a[1])[0];const streak=calcStreak();
+  document.getElementById('diary-stats').innerHTML=`<div class="dstat"><div class="dstat-num">${total}</div><div class="dstat-lbl">Trang nhật ký</div></div><div class="dstat"><div class="dstat-num">${streak}</div><div class="dstat-lbl">Ngày liên tiếp</div></div><div class="dstat"><div class="dstat-num" style="font-size:22px;">${topMood?topMood[0]:'--'}</div><div class="dstat-lbl">Tâm trạng chủ đạo</div></div>`;
 }
 
-function calcStreak(){
-  let s=0,d=new Date();
-  while(true){const k=dKey(d);if(!diary[k])break;s++;d.setDate(d.getDate()-1);}
-  return s;
-}
+function calcStreak(){let s=0,d=new Date();while(true){const k=dKey(d);if(!diary[k])break;s++;d.setDate(d.getDate()-1);}return s;}
 
 function renderMoodFilterBar(){
-  const bar=document.getElementById('diary-filter-bar');
-  const usedMoods=[...new Set(Object.values(diary).map(e=>e.mood).filter(Boolean))];
-  bar.innerHTML=`<button class="mf-btn ${moodFilter==='all'?'act':''}" data-mf="all" onclick="setMoodFilter('all')">Tất cả</button>`
-    +usedMoods.map(m=>`<button class="mf-btn ${moodFilter===m?'act':''}" data-mf="${m}" onclick="setMoodFilter('${m}')">${m}</button>`).join('');
+  const bar=document.getElementById('diary-filter-bar');const usedMoods=[...new Set(Object.values(diary).map(e=>e.mood).filter(Boolean))];
+  bar.innerHTML=`<button class="mf-btn ${moodFilter==='all'?'act':''}" data-mf="all" onclick="setMoodFilter('all')">Tất cả</button>`+usedMoods.map(m=>`<button class="mf-btn ${moodFilter===m?'act':''}" data-mf="${m}" onclick="setMoodFilter('${m}')">${m}</button>`).join('');
 }
 
 function setMoodFilter(m){moodFilter=m;renderMoodFilterBar();renderDiaryList();}
@@ -1024,69 +1197,37 @@ function renderDiaryList(){
   const list=document.getElementById('diary-list');
   if(!entries.length){list.innerHTML='<div class="diary-empty">Chưa có nhật ký nào.<br>Hãy bắt đầu viết hôm nay! ✍️</div>';return;}
   list.innerHTML=entries.map(([k,v])=>{
-    const date=new Date(k);const[ld,lm]=LC.s2l(date.getDate(),date.getMonth()+1,date.getFullYear());
-    const isToday=k===TODAY_KEY;
-    return`<div class="diary-entry" onclick="showDiaryEntry('${k}')">
-      <div class="de-hdr">
-        <div><div class="de-date">${isToday?'🔵 Hôm nay':''}${date.toLocaleDateString('vi-VN',{weekday:'short',day:'numeric',month:'short',year:'numeric'})}</div></div>
-        <div style="display:flex;align-items:center;gap:6px;"><span class="de-mood">${v.mood||''}</span><button class="de-del" onclick="event.stopPropagation();delDiary('${k}')" title="Xoá">✕</button></div>
-      </div>
-      <div class="de-preview">${v.text||'(Không có nội dung)'}</div>
-      <div class="de-lun">🌙 ${ld}/${lm} · ${new Date(v.ts||k).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})}</div>
-    </div>`;
+    const date=new Date(k);const[ld,lm]=LC.s2l(date.getDate(),date.getMonth()+1,date.getFullYear());const isToday=k===TODAY_KEY;
+    return`<div class="diary-entry" onclick="showDiaryEntry('${k}')"><div class="de-hdr"><div><div class="de-date">${isToday?'🔵 Hôm nay ':''}${date.toLocaleDateString('vi-VN',{weekday:'short',day:'numeric',month:'short',year:'numeric'})}</div></div><div style="display:flex;align-items:center;gap:6px;"><span class="de-mood">${v.mood||''}</span><button class="de-del" onclick="event.stopPropagation();delDiary('${k}')" title="Xoá">✕</button></div></div><div class="de-preview">${v.text||'(Không có nội dung)'}</div><div class="de-lun">🌙 ${ld}/${lm} · ${new Date(v.ts||k).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})}</div></div>`;
   }).join('');
 }
 
 function showDiaryEntry(k){
   const e=diary[k];if(!e)return;
-  const date=new Date(k);
-  const[ld,lm,ly]=LC.s2l(date.getDate(),date.getMonth()+1,date.getFullYear());
+  const date=new Date(k);const[ld,lm,ly]=LC.s2l(date.getDate(),date.getMonth()+1,date.getFullYear());
   document.getElementById('dv-title').textContent=date.toLocaleDateString('vi-VN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  document.getElementById('dv-body').innerHTML=`
-    <div style="background:var(--surface2);border-radius:12px;padding:18px;margin-bottom:16px;">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-        <span style="font-size:40px;">${e.mood||'📝'}</span>
-        <div>
-          <div style="font-size:13px;font-weight:700;">${date.toLocaleDateString('vi-VN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>
-          <div style="font-size:12px;color:var(--lun);margin-top:3px;">🌙 ${ld}/${lm}/${ly} Âm lịch</div>
-          ${e.mood?`<div style="font-size:11px;color:var(--muted);margin-top:3px;">Tâm trạng: ${e.mood}</div>`:''}
-        </div>
-      </div>
-    </div>
-    <div style="background:var(--surface2);border-radius:12px;padding:18px;font-size:14px;line-height:1.8;white-space:pre-wrap;color:var(--text);min-height:80px;">${e.text||'<em style="color:var(--muted)">Không có nội dung</em>'}</div>
-    <div style="margin-top:14px;display:flex;gap:8px;">
-      ${k===TODAY_KEY?`<button class="btn-p" onclick="closeOverlay('ov-diary');showPage('diary')">✏️ Sửa hôm nay</button>`:''}
-      <button class="btn-danger" onclick="closeOverlay('ov-diary');delDiary('${k}')">🗑️ Xoá trang này</button>
-    </div>
-  `;
+  document.getElementById('dv-body').innerHTML=`<div style="background:var(--surface2);border-radius:12px;padding:18px;margin-bottom:16px;"><div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;"><span style="font-size:40px;">${e.mood||'📝'}</span><div><div style="font-size:13px;font-weight:700;">${date.toLocaleDateString('vi-VN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div><div style="font-size:12px;color:var(--lun);margin-top:3px;">🌙 ${ld}/${lm}/${ly} Âm lịch</div>${e.mood?`<div style="font-size:11px;color:var(--muted);margin-top:3px;">Tâm trạng: ${e.mood}</div>`:''}</div></div></div><div style="background:var(--surface2);border-radius:12px;padding:18px;font-size:14px;line-height:1.8;white-space:pre-wrap;color:var(--text);min-height:80px;">${e.text||'<em style="color:var(--muted)">Không có nội dung</em>'}</div><div style="margin-top:14px;display:flex;gap:8px;">${k===TODAY_KEY?`<button class="btn-p" onclick="closeOverlay('ov-diary');showPage('diary')">✏️ Sửa hôm nay</button>`:''}<button class="btn-danger" onclick="closeOverlay('ov-diary');delDiary('${k}')">🗑️ Xoá trang này</button></div>`;
   openOverlay('ov-diary');
 }
 
-function delDiary(k){
-  askConfirm('Xoá trang nhật ký này? Không thể khôi phục.',()=>{
-    delete diary[k];saveDiaryStore();
-    renderDiaryList();renderDiaryStats();renderMoodFilterBar();renderCalendar();
-    toast('Đã xoá trang nhật ký','ok');
+async function delDiary(k){
+  askConfirm('Xoá trang nhật ký này? Không thể khôi phục.',async ()=>{
+    delete diary[k];await saveDiaryStore();renderDiaryList();renderDiaryStats();renderMoodFilterBar();renderCalendar();toast('Đã xoá trang nhật ký','ok');
   });
 }
 
 // ══════════════════════════════════════════════════════════
 // CONFIRM / DELETE
 // ══════════════════════════════════════════════════════════
-function askDel(id){
+async function askDel(id){
   const ev=customEvents.find(e=>e.id===id);
-  askConfirm(`Xoá sự kiện "${ev?.name||''}"? Không thể hoàn tác.`,()=>{
-    customEvents=customEvents.filter(e=>e.id!==id);saveCustom();refreshAll();toast('Đã xoá sự kiện','ok');
+  askConfirm(`Xoá sự kiện "${ev?.name||''}"? Không thể hoàn tác.`,async ()=>{
+    customEvents=customEvents.filter(e=>e.id!==id);await saveCustom();refreshAll();toast('Đã xoá sự kiện','ok');
   });
 }
 
-function askConfirm(msg,cb){
-  document.getElementById('conf-msg').textContent=msg;
-  document.getElementById('conf-yes').onclick=()=>{closeConf();cb();};
-  document.getElementById('conf').classList.add('open');
-}
+function askConfirm(msg,cb){document.getElementById('conf-msg').textContent=msg;document.getElementById('conf-yes').onclick=()=>{closeConf();cb();};document.getElementById('conf').classList.add('open');}
 function closeConf(){document.getElementById('conf').classList.remove('open');}
-
 function refreshAll(){rebuild();renderCountdown();renderCalendar();renderDiaryList&&renderDiaryList();}
 
 // ══════════════════════════════════════════════════════════
@@ -1095,7 +1236,7 @@ function refreshAll(){rebuild();renderCountdown();renderCalendar();renderDiaryLi
 function openOverlay(id){document.getElementById(id).classList.add('open');}
 function closeOverlay(id){document.getElementById(id).classList.remove('open');}
 function bgClose(e,id){if(e.target===document.getElementById(id))closeOverlay(id);}
-document.addEventListener('keydown',e=>{if(e.key==='Escape')['ov-form','ov-detail','ov-diary','conf'].forEach(id=>{const el=document.getElementById(id);if(el&&el.classList.contains('open'))el.classList.remove('open');});});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')['ov-form','ov-detail','ov-diary','ov-auth','conf'].forEach(id=>{const el=document.getElementById(id);if(el&&el.classList.contains('open'))el.classList.remove('open');});});
 
 // ══════════════════════════════════════════════════════════
 // PAGE NAV / CLOCK
@@ -1129,11 +1270,17 @@ renderCountdown();
 renderCalendar();
 clock();
 loadMainWx();
-// init diary date labels early
+setSyncStatus('idle');
+// Init diary date labels early
 (()=>{const n=new Date();const[ld,lm,ly]=LC.s2l(n.getDate(),n.getMonth()+1,n.getFullYear());const el1=document.getElementById('diary-today-date');const el2=document.getElementById('diary-today-lun');if(el1)el1.textContent=n.toLocaleDateString('vi-VN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});if(el2)el2.textContent=`🌙 ${ld}/${lm}/${ly} Âm lịch`;})();
 
 setInterval(()=>{clock();updateFeatCd();},1000);
 setInterval(loadMainWx,15*60*1000);
+
+// Verify auth token on load (async, non-blocking)
+if(authToken){
+  verifyToken().catch(()=>{});
+}
 </script>
 </body>
 </html>
