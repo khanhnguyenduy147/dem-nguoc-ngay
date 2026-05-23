@@ -3,315 +3,354 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Đếm Ngược Ngày Lễ Việt Nam</title>
+<title>Ngày Lễ Việt Nam · Đếm Ngược</title>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0a0a0f;--surface:#12121a;--surface2:#1a1a26;--surface3:#22223a;
-  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.13);
-  --text:#e8e6f0;--muted:#7a7890;--dim:#3a3858;
-  --red:#e63946;--gold:#f4a522;--teal:#2ec4b6;--purple:#9b72cf;--blue:#4cc9f0;--pink:#f72585;
-  --sol:#e63946;--lun:#f4a522;--hol:#2ec4b6;--per:#9b72cf;
+  --bg:#09090f;--surface:#111119;--surface2:#18182a;--surface3:#22223a;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.14);
+  --text:#e8e6f0;--muted:#7a7890;--dim:#2e2e48;
+  --red:#e63946;--gold:#f4a522;--teal:#2ec4b6;--purple:#9b72cf;--blue:#4cc9f0;--pink:#f72585;--green:#52d48f;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
 body{background:var(--bg);color:var(--text);font-family:'Be Vietnam Pro',sans-serif;min-height:100vh;overflow-x:hidden;}
-body::before{content:'';position:fixed;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(230,57,70,.07) 0%,transparent 70%);pointer-events:none;z-index:0;}
-body::after{content:'';position:fixed;bottom:-200px;left:-100px;width:500px;height:500px;background:radial-gradient(circle,rgba(76,201,240,.05) 0%,transparent 70%);pointer-events:none;z-index:0;}
+body::before{content:'';position:fixed;top:-300px;right:-200px;width:700px;height:700px;background:radial-gradient(circle,rgba(230,57,70,.06) 0%,transparent 70%);pointer-events:none;z-index:0;}
+body::after{content:'';position:fixed;bottom:-200px;left:-100px;width:500px;height:500px;background:radial-gradient(circle,rgba(76,201,240,.04) 0%,transparent 70%);pointer-events:none;z-index:0;}
 
 /* ── HEADER ── */
-header{position:sticky;top:0;z-index:200;background:rgba(10,10,15,.96);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:13px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
-.logo{font-family:'Playfair Display',serif;font-size:20px;color:var(--text);display:flex;align-items:center;gap:8px;white-space:nowrap;}
+header{position:sticky;top:0;z-index:200;background:rgba(9,9,15,.95);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);padding:10px 24px;display:flex;align-items:center;gap:12px;}
+.logo{font-family:'Playfair Display',serif;font-size:18px;color:var(--text);display:flex;align-items:center;gap:7px;white-space:nowrap;flex-shrink:0;}
 .logo span{color:var(--red);}
-nav{display:flex;gap:3px;}
-nav button{background:none;border:none;cursor:pointer;color:var(--muted);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:500;padding:8px 13px;border-radius:8px;transition:all .2s;}
+nav{display:flex;gap:2px;flex-shrink:0;}
+nav button{background:none;border:none;cursor:pointer;color:var(--muted);font-family:'Be Vietnam Pro',sans-serif;font-size:12px;font-weight:600;padding:7px 12px;border-radius:8px;transition:all .2s;white-space:nowrap;}
 nav button.active,nav button:hover{background:var(--surface2);color:var(--text);}
 nav button.active{color:var(--gold);}
-.header-right{display:flex;align-items:center;gap:12px;}
-.header-time{font-size:13px;color:var(--muted);text-align:right;line-height:1.4;white-space:nowrap;}
-.header-time strong{color:var(--text);font-size:15px;display:block;}
+.header-mid{flex:1;display:flex;justify-content:center;}
+.header-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
 
-/* ── AUTH BUTTON IN HEADER ── */
-.auth-btn{background:var(--surface2);border:1px solid var(--border2);color:var(--muted);cursor:pointer;font-family:'Be Vietnam Pro',sans-serif;font-size:12px;font-weight:700;padding:6px 14px;border-radius:8px;transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:5px;}
+/* Clock + Lunar combined */
+.clock-block{text-align:right;line-height:1.3;}
+.clock-time{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--text);}
+.clock-solar{font-size:11px;color:var(--muted);}
+.clock-lunar{font-size:10px;color:var(--gold);margin-top:1px;}
+
+.auth-btn{background:var(--surface2);border:1px solid var(--border2);color:var(--muted);cursor:pointer;font-family:'Be Vietnam Pro',sans-serif;font-size:11px;font-weight:700;padding:6px 12px;border-radius:8px;transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:5px;}
 .auth-btn:hover{border-color:var(--purple);color:var(--purple);}
 .auth-btn.logged{border-color:rgba(46,196,182,.4);color:var(--teal);}
-.auth-btn.logged:hover{border-color:var(--red);color:var(--red);}
-.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0;}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0;animation:none;}
 .sync-dot.syncing{background:var(--gold);animation:pulse 1s infinite;}
-.sync-dot.error{background:var(--red);}
+.sync-dot.err{background:var(--red);}
 
 /* ── LAYOUT ── */
-.container{max-width:1400px;margin:0 auto;padding:28px;position:relative;z-index:1;}
-.page{display:none;animation:fadeIn .35s ease;}
+.container{max-width:1400px;margin:0 auto;padding:24px;position:relative;z-index:1;}
+.page{display:none;animation:fadeIn .3s ease;}
 .page.active{display:block;}
-.section-label{font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);margin-bottom:18px;}
+.sec-label{font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;}
 
-/* ── TAG FILTERS ── */
-.tag-bar{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:24px;align-items:center;}
-.tb{border:none;cursor:pointer;font-family:'Be Vietnam Pro',sans-serif;font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:6px 15px;border-radius:100px;transition:all .2s;}
-.tb-all{background:var(--surface2);color:var(--muted);}
-.tb-sol{background:rgba(230,57,70,.1);color:var(--sol);border:1px solid rgba(230,57,70,.3);}
-.tb-lun{background:rgba(244,165,34,.1);color:var(--lun);border:1px solid rgba(244,165,34,.3);}
-.tb-hol{background:rgba(46,196,182,.1);color:var(--hol);border:1px solid rgba(46,196,182,.3);}
-.tb-per{background:rgba(155,114,207,.1);color:var(--per);border:1px solid rgba(155,114,207,.3);}
-.tb.act{transform:scale(1.05);}
-.tb-all.act{background:var(--text);color:var(--bg);}
-.btn-new{background:linear-gradient(135deg,rgba(155,114,207,.25),rgba(155,114,207,.12));color:var(--per);border:1px solid rgba(155,114,207,.45);border-radius:100px;cursor:pointer;font-family:'Be Vietnam Pro',sans-serif;font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:6px 18px;transition:all .2s;margin-left:auto;}
-.btn-new:hover{background:rgba(155,114,207,.35);transform:scale(1.04);}
+/* ── QUOTE BAR ── */
+.quote-bar{background:linear-gradient(135deg,rgba(155,114,207,.08),rgba(76,201,240,.05));border:1px solid rgba(155,114,207,.2);border-radius:14px;padding:14px 20px;margin-bottom:20px;display:flex;align-items:flex-start;gap:12px;}
+.quote-icon{font-size:22px;flex-shrink:0;margin-top:2px;}
+.quote-text{font-size:13px;color:var(--text);line-height:1.6;font-style:italic;flex:1;}
+.quote-author{font-size:11px;color:var(--muted);margin-top:4px;font-style:normal;}
+
+/* ── TODAY EVENTS BANNER ── */
+.today-banner{margin-bottom:20px;}
+.today-banner-inner{background:linear-gradient(135deg,rgba(244,165,34,.15),rgba(230,57,70,.1));border:1px solid rgba(244,165,34,.4);border-radius:16px;padding:0;overflow:hidden;}
+.today-banner-hdr{display:flex;align-items:center;gap:10px;padding:14px 20px 10px;border-bottom:1px solid rgba(244,165,34,.2);}
+.today-banner-title{font-size:13px;font-weight:700;color:var(--gold);}
+.today-wish{font-size:12px;color:rgba(244,165,34,.8);margin-left:auto;font-style:italic;}
+.today-items{display:flex;flex-wrap:wrap;gap:10px;padding:12px 20px 14px;}
+.today-item{background:rgba(0,0,0,.3);border:1px solid rgba(244,165,34,.3);border-radius:12px;padding:10px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .2s;flex:1;min-width:220px;}
+.today-item:hover{border-color:var(--gold);transform:translateY(-1px);}
+.today-item-icon{font-size:22px;}
+.today-item-name{font-size:14px;font-weight:700;color:var(--text);}
+.today-item-tag{font-size:10px;color:var(--muted);margin-top:2px;}
 
 /* ── FEATURED ── */
-.featured{background:linear-gradient(135deg,var(--surface),rgba(26,26,38,.85));border:1px solid var(--border);border-radius:20px;padding:36px 40px;margin-bottom:24px;position:relative;overflow:hidden;}
+.featured{background:linear-gradient(135deg,var(--surface),rgba(24,24,42,.9));border:1px solid var(--border);border-radius:20px;padding:32px 36px;margin-bottom:20px;position:relative;overflow:hidden;}
 .featured::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--red),var(--gold),var(--purple));}
-.feat-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
-.feat-name{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;margin-bottom:4px;}
-.feat-sub{color:var(--muted);font-size:13px;margin-bottom:26px;}
-.cd-row{display:flex;gap:10px;flex-wrap:wrap;}
-.cd-unit{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px 20px;text-align:center;min-width:80px;}
-.cd-num{font-family:'Playfair Display',serif;font-size:36px;font-weight:700;color:var(--gold);line-height:1;display:block;}
-.cd-lbl{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-top:5px;display:block;}
-.feat-wx{position:absolute;top:36px;right:36px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px 18px;text-align:center;min-width:108px;}
-.feat-wx-icon{font-size:28px;display:block;margin-bottom:3px;}
-.feat-wx-temp{font-size:17px;font-weight:700;}
-.feat-wx-city{font-size:10px;color:var(--muted);margin-top:2px;}
+.feat-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.feat-name{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;margin-bottom:4px;padding-right:150px;}
+.feat-sub{color:var(--muted);font-size:12px;margin-bottom:22px;}
+.cd-row{display:flex;gap:8px;flex-wrap:wrap;}
+.cd-unit{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px 18px;text-align:center;min-width:76px;}
+.cd-num{font-family:'Playfair Display',serif;font-size:32px;font-weight:700;color:var(--gold);line-height:1;display:block;}
+.cd-lbl{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-top:4px;display:block;}
+.feat-wx{position:absolute;top:32px;right:32px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px 16px;text-align:center;min-width:100px;}
+.feat-wx-icon{font-size:26px;display:block;margin-bottom:2px;}
+.feat-wx-temp{font-size:16px;font-weight:700;}
+.feat-wx-city{font-size:9px;color:var(--muted);margin-top:2px;}
 
-/* ── EVENTS GRID ── */
-.evgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(285px,1fr));gap:13px;}
-.ecard{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;cursor:pointer;}
-.ecard:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.4);}
-.ecard[data-tag="solar"]{border-left:3px solid var(--sol);}
-.ecard[data-tag="lunar"]{border-left:3px solid var(--lun);}
-.ecard[data-tag="holiday"]{border-left:3px solid var(--hol);}
-.ecard[data-tag="personal"]{border-left:3px solid var(--per);}
-.ecard.passed{opacity:.38;}
-.etag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 9px;border-radius:100px;margin-bottom:9px;}
-.tg-solar{background:rgba(230,57,70,.15);color:var(--sol);}
-.tg-lunar{background:rgba(244,165,34,.15);color:var(--lun);}
-.tg-holiday{background:rgba(46,196,182,.15);color:var(--hol);}
-.tg-personal{background:rgba(155,114,207,.15);color:var(--per);}
-.ename{font-size:15px;font-weight:700;margin-bottom:3px;line-height:1.3;padding-right:52px;}
-.edate{font-size:11px;color:var(--muted);margin-bottom:8px;}
-.eloc{font-size:11px;color:var(--blue);margin-bottom:7px;display:flex;align-items:center;gap:3px;}
-.emini{display:flex;gap:5px;align-items:center;}
+/* ── TAG BAR ── */
+.tag-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;align-items:center;}
+.tb{border:1px solid transparent;cursor:pointer;font-family:'Be Vietnam Pro',sans-serif;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:5px 13px;border-radius:100px;transition:all .2s;display:flex;align-items:center;gap:4px;white-space:nowrap;}
+.tb-all{background:var(--surface2);color:var(--muted);border-color:var(--border);}
+.tb-all.act{background:var(--text);color:var(--bg);border-color:var(--text);}
+.btn-new-ev{background:linear-gradient(135deg,rgba(155,114,207,.2),rgba(155,114,207,.1));color:var(--purple);border:1px solid rgba(155,114,207,.4);border-radius:100px;cursor:pointer;font-family:'Be Vietnam Pro',sans-serif;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:5px 16px;transition:all .2s;white-space:nowrap;}
+.btn-new-ev:hover{background:rgba(155,114,207,.3);}
+.btn-manage-tags{background:none;color:var(--dim);border:1px solid var(--dim);border-radius:100px;cursor:pointer;font-family:'Be Vietnam Pro',sans-serif;font-size:10px;font-weight:700;padding:5px 13px;transition:all .2s;white-space:nowrap;}
+.btn-manage-tags:hover{color:var(--muted);border-color:var(--muted);}
+
+/* ── EVENT GRID ── */
+.evgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;}
+.ecard{background:var(--surface);border:1px solid var(--border);border-radius:15px;padding:18px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;cursor:pointer;}
+.ecard:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.45);}
+.ecard.passed{opacity:.35;}
+.ecard.today-ev{opacity:1 !important;}
+.etag{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 9px;border-radius:100px;margin-bottom:8px;}
+.ename{font-size:14px;font-weight:700;margin-bottom:3px;line-height:1.3;padding-right:48px;}
+.edate{font-size:10px;color:var(--muted);margin-bottom:7px;}
+.eloc{font-size:10px;color:var(--blue);margin-bottom:6px;display:flex;align-items:center;gap:3px;}
+.emini{display:flex;gap:4px;align-items:center;}
 .mn{text-align:center;}
-.mn-num{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:var(--text);display:block;line-height:1;}
-.mn-lbl{font-size:8px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
-.mn-sep{color:var(--dim);font-size:15px;margin-top:-3px;}
-.epast{font-size:11px;color:var(--muted);font-style:italic;}
-.ewx-row{margin-top:9px;padding-top:9px;border-top:1px solid var(--border);display:flex;align-items:center;gap:7px;}
-.ewx-icon{font-size:17px;}
-.ewx-temp{font-size:13px;font-weight:700;}
-.card-acts{position:absolute;top:12px;right:12px;display:flex;gap:3px;opacity:0;transition:opacity .2s;}
+.mn-num{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;display:block;line-height:1;}
+.mn-lbl{font-size:7px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
+.mn-sep{color:var(--dim);font-size:13px;margin-top:-2px;}
+.epast{font-size:10px;color:var(--muted);font-style:italic;}
+.ewx-row{margin-top:8px;padding-top:8px;border-top:1px solid var(--border);display:flex;align-items:center;gap:6px;}
+.ewx-icon{font-size:15px;}
+.ewx-temp{font-size:12px;font-weight:700;}
+.card-acts{position:absolute;top:10px;right:10px;display:flex;gap:2px;opacity:0;transition:opacity .15s;}
 .ecard:hover .card-acts{opacity:1;}
-.cact{background:var(--surface2);border:1px solid var(--border);cursor:pointer;color:var(--muted);font-size:11px;padding:4px 7px;border-radius:6px;transition:all .2s;font-family:'Be Vietnam Pro',sans-serif;line-height:1;}
-.cact.edit:hover{color:var(--blue);border-color:var(--blue);background:rgba(76,201,240,.1);}
-.cact.del:hover{color:var(--red);border-color:var(--red);background:rgba(230,57,70,.1);}
+.cact{background:var(--surface2);border:1px solid var(--border);cursor:pointer;color:var(--muted);font-size:10px;padding:3px 6px;border-radius:5px;transition:all .15s;font-family:'Be Vietnam Pro',sans-serif;line-height:1;}
+.cact.edit:hover{color:var(--blue);border-color:var(--blue);}
+.cact.del:hover{color:var(--red);border-color:var(--red);}
 
 /* ── WEATHER BAR ── */
-.wxbar{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px 22px;margin-bottom:18px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
-.wxb-icon{font-size:40px;flex-shrink:0;}
-.wxb-main{flex:1;min-width:150px;}
-.wxb-city{font-size:11px;color:var(--muted);}
+.wxbar{background:var(--surface);border:1px solid var(--border);border-radius:15px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.wxb-icon{font-size:38px;flex-shrink:0;}
+.wxb-main{flex:1;min-width:140px;}
+.wxb-city{font-size:10px;color:var(--muted);}
 .wxb-tr{display:flex;align-items:baseline;gap:8px;margin-top:2px;}
-.wxb-temp{font-family:'Playfair Display',serif;font-size:34px;font-weight:700;line-height:1;}
-.wxb-desc{font-size:13px;color:var(--muted);}
-.wxb-dets{display:flex;gap:12px;flex-wrap:wrap;margin-top:5px;}
-.wxb-d{font-size:12px;color:var(--muted);}
-.wxb-ctrl{display:flex;flex-direction:column;gap:7px;min-width:210px;}
-.wxb-cl{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);}
-.wxb-row{display:flex;gap:7px;}
-.wxb-inp{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;padding:7px 11px;border-radius:8px;outline:none;flex:1;transition:border-color .2s;}
+.wxb-temp{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;line-height:1;}
+.wxb-desc{font-size:12px;color:var(--muted);}
+.wxb-dets{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;}
+.wxb-d{font-size:11px;color:var(--muted);}
+.wxb-ctrl{display:flex;flex-direction:column;gap:6px;min-width:200px;}
+.wxb-cl{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);}
+.wxb-row{display:flex;gap:6px;}
+.wxb-inp{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'Be Vietnam Pro',sans-serif;font-size:12px;padding:7px 10px;border-radius:8px;outline:none;flex:1;transition:border-color .2s;}
 .wxb-inp:focus{border-color:var(--blue);}
-.wxb-btn{background:var(--surface2);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:'Be Vietnam Pro',sans-serif;font-size:12px;font-weight:700;padding:7px 13px;border-radius:8px;transition:all .2s;white-space:nowrap;}
+.wxb-btn{background:var(--surface2);border:1px solid var(--border2);color:var(--text);cursor:pointer;font-family:'Be Vietnam Pro',sans-serif;font-size:11px;font-weight:700;padding:7px 12px;border-radius:8px;transition:all .2s;}
 .wxb-btn:hover{border-color:var(--blue);color:var(--blue);}
-.wxb-hint{font-size:11px;color:var(--dim);}
+.wxb-hint{font-size:10px;color:var(--dim);}
 
 /* ── CALENDAR ── */
-.cal-layout{display:grid;grid-template-columns:1fr 355px;gap:18px;}
-.cal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
-.cal-my{font-family:'Playfair Display',serif;font-size:23px;font-weight:700;}
-.cal-nav-row{display:flex;gap:5px;}
-.cal-nav-row button{background:var(--surface2);border:1px solid var(--border);color:var(--text);cursor:pointer;border-radius:8px;min-width:32px;height:32px;padding:0 10px;font-size:14px;transition:all .2s;display:flex;align-items:center;justify-content:center;font-family:'Be Vietnam Pro',sans-serif;font-size:12px;font-weight:700;}
+.cal-layout{display:grid;grid-template-columns:1fr 340px;gap:16px;}
+.cal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.cal-my{font-family:'Playfair Display',serif;font-size:21px;font-weight:700;}
+.cal-nav-row{display:flex;gap:4px;}
+.cal-nav-row button{background:var(--surface2);border:1px solid var(--border);color:var(--text);cursor:pointer;border-radius:7px;min-width:30px;height:30px;padding:0 8px;font-size:13px;transition:all .2s;display:flex;align-items:center;justify-content:center;font-family:'Be Vietnam Pro',sans-serif;font-size:11px;font-weight:700;}
 .cal-nav-row button:hover{border-color:var(--gold);}
-.cal-dow-row{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:3px;}
-.cal-dow{text-align:center;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:5px;}
+.cal-dow-row{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:2px;}
+.cal-dow{text-align:center;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:4px;}
 .cal-dow:first-child{color:var(--red);}
 .calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
-.cday{border-radius:8px;padding:4px;cursor:pointer;transition:background .12s;display:flex;flex-direction:column;align-items:flex-start;min-height:60px;}
+.cday{border-radius:7px;padding:3px;cursor:pointer;transition:background .1s;display:flex;flex-direction:column;align-items:flex-start;min-height:56px;}
 .cday:hover{background:var(--surface);}
 .cday.other{opacity:.2;}
 .cday.today{background:var(--surface2);border:1px solid var(--gold);}
 .cday.sel{background:var(--surface2);border:1px solid var(--blue);}
 .cday.sun .cday-num{color:var(--red);}
-.cday-num{font-size:12px;font-weight:600;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.cday-num{font-size:11px;font-weight:600;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
 .cday.today .cday-num{background:var(--gold);color:var(--bg);}
-.cday-lun{font-size:8px;color:var(--muted);margin-top:1px;}
+.cday-lun{font-size:7px;color:var(--muted);margin-top:1px;}
 .cdots{display:flex;flex-wrap:wrap;gap:2px;margin-top:auto;padding-top:2px;}
 .cdot{width:4px;height:4px;border-radius:50%;}
-.cdot-solar{background:var(--sol);}.cdot-lunar{background:var(--lun);}.cdot-holiday{background:var(--hol);}.cdot-personal{background:var(--per);}
 
 /* ── SIDEBAR ── */
-.sb-card{background:var(--surface);border:1px solid var(--border);border-radius:15px;padding:18px;margin-bottom:12px;}
-.sb-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
-.sel-date{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;margin-bottom:3px;}
-.sel-lun{font-size:12px;color:var(--lun);margin-bottom:12px;}
-.dev-list{display:flex;flex-direction:column;gap:7px;}
-.dev-item{display:flex;align-items:flex-start;gap:9px;padding:9px 11px;border-radius:9px;background:var(--surface2);border:1px solid var(--border);transition:border-color .15s;cursor:pointer;}
+.sb-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:10px;}
+.sb-title{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+.sel-date{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;margin-bottom:2px;}
+.sel-lun{font-size:11px;color:var(--lun,#f4a522);margin-bottom:10px;}
+.dev-list{display:flex;flex-direction:column;gap:6px;}
+.dev-item{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);cursor:pointer;transition:border-color .15s;}
 .dev-item:hover{border-color:var(--border2);}
-.dev-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:4px;}
-.dev-name{font-size:13px;font-weight:600;}
-.dev-meta{font-size:10px;color:var(--muted);margin-top:2px;}
-.no-ev{font-size:13px;color:var(--muted);font-style:italic;text-align:center;padding:18px;}
+.dev-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.dev-name{font-size:12px;font-weight:600;}
+.dev-meta{font-size:9px;color:var(--muted);margin-top:2px;}
+.no-ev{font-size:12px;color:var(--muted);font-style:italic;text-align:center;padding:16px;}
 
 /* ── FORMS ── */
-.fgroup{display:flex;flex-direction:column;gap:5px;margin-bottom:11px;}
-.flabel{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);}
+.fgroup{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;}
+.flabel{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);}
 .finp,.fsel,.ftxt{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;padding:9px 12px;border-radius:9px;outline:none;transition:border-color .2s;width:100%;}
 .finp:focus,.fsel:focus,.ftxt:focus{border-color:var(--purple);}
-.frow{display:grid;grid-template-columns:1fr 76px;gap:8px;}
-.finp-row{display:flex;gap:7px;}
+.frow2{display:grid;grid-template-columns:1fr 70px;gap:7px;}
+.finp-row{display:flex;gap:6px;}
 .finp-row .finp{flex:1;}
-.loc-prev{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:11px 14px;display:none;align-items:center;gap:11px;margin-top:5px;}
-.lp-icon{font-size:24px;}
-.lp-temp{font-size:14px;font-weight:700;}
-.lp-city{font-size:11px;color:var(--muted);margin-top:1px;}
+
+/* Advanced time input */
+.adv-time-toggle{display:flex;align-items:center;gap:8px;margin-bottom:8px;cursor:pointer;user-select:none;}
+.adv-time-toggle input[type=checkbox]{accent-color:var(--purple);width:15px;height:15px;cursor:pointer;}
+.adv-time-toggle span{font-size:11px;color:var(--muted);}
+.adv-time-panel{display:none;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;}
+.adv-time-panel.show{display:block;}
+.time-inputs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.time-unit{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.time-unit label{font-size:9px;color:var(--muted);font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.time-unit input{background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'Be Vietnam Pro',sans-serif;font-size:20px;font-weight:700;text-align:center;width:100%;padding:8px 4px;border-radius:8px;outline:none;}
+.time-unit input:focus{border-color:var(--purple);}
+
+.loc-prev{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:10px 12px;display:none;align-items:center;gap:10px;margin-top:5px;}
+.lp-icon{font-size:22px;}
+.lp-temp{font-size:13px;font-weight:700;}
+.lp-city{font-size:10px;color:var(--muted);margin-top:1px;}
 .btn-p{background:linear-gradient(135deg,var(--purple),#7b5ea7);border:none;color:#fff;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;padding:10px;border-radius:9px;cursor:pointer;transition:all .2s;flex:1;}
 .btn-p:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(155,114,207,.4);}
 .btn-s{background:var(--surface2);border:1px solid var(--border2);color:var(--muted);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:600;padding:10px;border-radius:9px;cursor:pointer;transition:all .2s;flex:1;}
 .btn-s:hover{color:var(--text);}
 .btn-danger{background:var(--red);border:none;color:#fff;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;padding:10px;border-radius:9px;cursor:pointer;transition:all .2s;flex:1;}
 .btn-danger:hover{opacity:.85;}
-.mact-row{display:flex;gap:8px;margin-top:18px;}
+.btn-teal{background:linear-gradient(135deg,var(--teal),#22a89e);border:none;color:#fff;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;padding:10px;border-radius:9px;cursor:pointer;transition:all .2s;flex:1;}
+.mact-row{display:flex;gap:7px;margin-top:16px;}
 
-/* ── MODAL OVERLAY ── */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.74);backdrop-filter:blur(10px);z-index:500;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .25s;}
+/* ── MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);z-index:500;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .22s;}
 .overlay.open{opacity:1;pointer-events:all;}
-.modal{background:var(--surface);border:1px solid var(--border2);border-radius:20px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;transform:translateY(18px);transition:transform .25s;}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:20px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;transform:translateY(16px);transition:transform .22s;}
 .overlay.open .modal{transform:translateY(0);}
 .modal-wide{max-width:580px;}
-.mhdr{display:flex;align-items:flex-start;justify-content:space-between;padding:26px 28px 0;}
-.mtitle{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;}
-.mclose{background:var(--surface2);border:1px solid var(--border);cursor:pointer;color:var(--muted);width:30px;height:30px;border-radius:7px;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
+.modal-lg{max-width:640px;}
+.mhdr{display:flex;align-items:flex-start;justify-content:space-between;padding:24px 26px 0;}
+.mtitle{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;}
+.mclose{background:var(--surface2);border:1px solid var(--border);cursor:pointer;color:var(--muted);width:28px;height:28px;border-radius:7px;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
 .mclose:hover{color:var(--text);}
-.mbody{padding:20px 28px 28px;}
+.mbody{padding:18px 26px 26px;}
 
-/* ── EVENT DETAIL MODAL ── */
-.detail-hero{background:var(--surface2);border-radius:14px;padding:22px;margin-bottom:20px;position:relative;overflow:hidden;}
+/* ── DETAIL MODAL ── */
+.detail-hero{background:var(--surface2);border-radius:14px;padding:20px;margin-bottom:18px;position:relative;overflow:hidden;}
 .detail-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
-.detail-hero.sol::before{background:var(--sol);}
-.detail-hero.lun::before{background:var(--lun);}
-.detail-hero.hol::before{background:linear-gradient(90deg,var(--hol),var(--blue));}
-.detail-hero.per::before{background:var(--per);}
-.dh-icon{font-size:40px;margin-bottom:10px;display:block;}
-.dh-name{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;margin-bottom:4px;}
-.dh-date{font-size:13px;color:var(--muted);margin-bottom:14px;}
-.dh-cd{display:flex;gap:8px;flex-wrap:wrap;}
-.dh-unit{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 14px;text-align:center;min-width:64px;}
-.dh-num{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--gold);line-height:1;display:block;}
-.dh-lbl{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-top:4px;display:block;}
-.detail-section{margin-bottom:16px;}
-.detail-section-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
-.detail-row{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--surface2);border-radius:9px;margin-bottom:6px;font-size:13px;}
-.detail-row-icon{font-size:16px;flex-shrink:0;}
+.dh-icon{font-size:36px;margin-bottom:8px;display:block;}
+.dh-name{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;margin-bottom:4px;}
+.dh-date{font-size:12px;color:var(--muted);margin-bottom:12px;}
+.dh-cd{display:flex;gap:7px;flex-wrap:wrap;}
+.dh-unit{background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:9px 12px;text-align:center;min-width:60px;}
+.dh-num{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--gold);line-height:1;display:block;}
+.dh-lbl{font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-top:3px;display:block;}
+.detail-section{margin-bottom:14px;}
+.detail-section-title{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:7px;}
+.detail-row{display:flex;align-items:center;gap:9px;padding:8px 11px;background:var(--surface2);border-radius:8px;margin-bottom:5px;font-size:12px;}
+.detail-row-icon{font-size:15px;flex-shrink:0;}
 .detail-row-val{color:var(--text);}
-.detail-row-val span{color:var(--muted);font-size:11px;margin-left:6px;}
-.detail-wx-box{background:var(--surface2);border-radius:12px;padding:16px;display:flex;align-items:center;gap:14px;}
-.dwx-icon{font-size:36px;}
-.dwx-temp{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;}
-.dwx-info{font-size:12px;color:var(--muted);margin-top:3px;}
-.detail-note{background:var(--surface2);border-radius:10px;padding:13px;font-size:13px;color:var(--text);line-height:1.6;}
-.dact-row{display:flex;gap:8px;}
+.detail-row-val span{color:var(--muted);font-size:10px;margin-left:6px;}
+.detail-wx-box{background:var(--surface2);border-radius:11px;padding:14px;display:flex;align-items:center;gap:12px;}
+.dwx-icon{font-size:32px;}
+.dwx-temp{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;}
+.dwx-info{font-size:11px;color:var(--muted);margin-top:2px;}
+.detail-note{background:var(--surface2);border-radius:9px;padding:12px;font-size:12px;color:var(--text);line-height:1.6;}
+.dact-row{display:flex;gap:7px;}
 
-/* ── DIARY PAGE ── */
-.diary-layout{display:grid;grid-template-columns:1fr 320px;gap:20px;}
-.mood-picker{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
-.mood-btn{background:var(--surface2);border:2px solid transparent;cursor:pointer;border-radius:12px;padding:8px 12px;font-size:22px;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:62px;}
+/* ── TAGS MANAGER ── */
+.tags-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:18px;}
+.tag-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;position:relative;transition:border-color .2s;}
+.tag-card:hover{border-color:var(--border2);}
+.tag-card-top{display:flex;align-items:center;gap:9px;margin-bottom:8px;}
+.tag-icon-big{font-size:24px;}
+.tag-card-name{font-size:14px;font-weight:700;}
+.tag-card-count{font-size:10px;color:var(--muted);margin-top:2px;}
+.tag-card-swatch{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-left:auto;}
+.tag-card-acts{display:flex;gap:5px;margin-top:10px;}
+.tag-card-act{background:none;border:1px solid var(--border);color:var(--muted);cursor:pointer;font-family:'Be Vietnam Pro',sans-serif;font-size:10px;font-weight:600;padding:4px 9px;border-radius:6px;transition:all .15s;flex:1;text-align:center;}
+.tag-card-act:hover{color:var(--text);border-color:var(--border2);}
+.tag-card-act.share:hover{color:var(--teal);border-color:var(--teal);}
+.tag-card-act.del:hover{color:var(--red);border-color:var(--red);}
+.share-code-box{background:var(--bg);border:1px solid var(--teal);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;margin-top:10px;}
+.share-code{font-size:20px;font-weight:800;letter-spacing:3px;color:var(--teal);font-variant-numeric:tabular-nums;flex:1;}
+.copy-btn{background:none;border:1px solid var(--teal);color:var(--teal);cursor:pointer;font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;font-family:'Be Vietnam Pro',sans-serif;transition:all .2s;}
+.copy-btn:hover{background:var(--teal);color:var(--bg);}
+.import-tag-box{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:18px;}
+.import-row{display:flex;gap:8px;margin-top:8px;}
+
+/* Color picker for tags */
+.color-opts{display:flex;gap:7px;flex-wrap:wrap;margin-top:6px;}
+.color-opt{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .2s;}
+.color-opt.sel{border-color:var(--text);transform:scale(1.15);}
+
+/* ── DIARY ── */
+.diary-layout{display:grid;grid-template-columns:1fr 310px;gap:18px;}
+.mood-picker{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px;}
+.mood-btn{background:var(--surface2);border:2px solid transparent;cursor:pointer;border-radius:11px;padding:7px 10px;font-size:20px;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:58px;}
 .mood-btn:hover{border-color:var(--border2);transform:scale(1.08);}
 .mood-btn.sel{border-color:var(--gold);background:rgba(244,165,34,.1);}
-.mood-name{font-size:9px;color:var(--muted);font-weight:600;letter-spacing:.5px;}
-.diary-date-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-.diary-date-lbl{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;}
-.diary-date-lun{font-size:12px;color:var(--lun);}
-.diary-textarea{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'Be Vietnam Pro',sans-serif;font-size:14px;line-height:1.7;padding:16px;border-radius:12px;outline:none;width:100%;resize:vertical;min-height:160px;transition:border-color .2s;}
+.mood-name{font-size:8px;color:var(--muted);font-weight:600;letter-spacing:.5px;}
+.diary-date-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.diary-date-lbl{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;}
+.diary-date-lun{font-size:11px;color:var(--gold);}
+.diary-textarea{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;line-height:1.7;padding:14px;border-radius:11px;outline:none;width:100%;resize:vertical;min-height:150px;transition:border-color .2s;}
 .diary-textarea:focus{border-color:var(--purple);}
-.diary-save-bar{display:flex;align-items:center;justify-content:space-between;margin-top:10px;}
-.diary-chars{font-size:11px;color:var(--dim);}
-.diary-saved-badge{font-size:11px;color:var(--teal);display:none;}
+.diary-save-bar{display:flex;align-items:center;justify-content:space-between;margin-top:8px;}
+.diary-chars{font-size:10px;color:var(--dim);}
+.diary-saved-badge{font-size:10px;color:var(--teal);display:none;}
 .diary-saved-badge.show{display:block;}
-.diary-entries{display:flex;flex-direction:column;gap:10px;max-height:calc(100vh - 200px);overflow-y:auto;padding-right:4px;}
-.diary-entry{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:15px;cursor:pointer;transition:all .2s;}
+.diary-entries{display:flex;flex-direction:column;gap:9px;max-height:calc(100vh - 180px);overflow-y:auto;padding-right:3px;}
+.diary-entry{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:13px;cursor:pointer;transition:all .15s;}
 .diary-entry:hover{border-color:var(--border2);transform:translateX(2px);}
-.de-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
-.de-date{font-size:12px;font-weight:700;color:var(--text);}
-.de-mood{font-size:18px;}
-.de-preview{font-size:12px;color:var(--muted);line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
-.de-lun{font-size:10px;color:var(--lun);margin-top:4px;}
-.de-del{background:none;border:none;cursor:pointer;color:var(--dim);font-size:13px;padding:3px;transition:color .2s;line-height:1;}
+.de-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.de-date{font-size:11px;font-weight:700;color:var(--text);}
+.de-mood{font-size:17px;}
+.de-preview{font-size:11px;color:var(--muted);line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.de-lun{font-size:9px;color:var(--gold);margin-top:3px;}
+.de-del{background:none;border:none;cursor:pointer;color:var(--dim);font-size:12px;padding:2px;transition:color .2s;line-height:1;}
 .de-del:hover{color:var(--red);}
-.diary-empty{text-align:center;padding:40px 20px;color:var(--muted);font-style:italic;font-size:13px;}
-.diary-search{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;padding:9px 12px;border-radius:10px;outline:none;width:100%;transition:border-color .2s;margin-bottom:12px;}
+.diary-empty{text-align:center;padding:36px 18px;color:var(--muted);font-style:italic;font-size:12px;}
+.diary-search{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'Be Vietnam Pro',sans-serif;font-size:12px;padding:8px 11px;border-radius:9px;outline:none;width:100%;transition:border-color .2s;margin-bottom:10px;}
 .diary-search:focus{border-color:var(--purple);}
-.diary-filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
-.mf-btn{background:var(--surface2);border:1px solid var(--border);cursor:pointer;border-radius:100px;padding:3px 11px;font-size:18px;transition:all .15s;}
+.diary-filter-bar{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;}
+.mf-btn{background:var(--surface2);border:1px solid var(--border);cursor:pointer;border-radius:100px;padding:3px 10px;font-size:16px;transition:all .15s;}
 .mf-btn.act{border-color:var(--gold);background:rgba(244,165,34,.1);}
-.diary-stats{display:flex;gap:8px;margin-bottom:16px;}
-.dstat{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;text-align:center;flex:1;}
-.dstat-num{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--gold);}
-.dstat-lbl{font-size:10px;color:var(--muted);font-weight:600;letter-spacing:.5px;margin-top:2px;}
+.diary-stats{display:flex;gap:7px;margin-bottom:14px;}
+.dstat{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:9px 12px;text-align:center;flex:1;}
+.dstat-num{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--gold);}
+.dstat-lbl{font-size:9px;color:var(--muted);font-weight:600;letter-spacing:.5px;margin-top:1px;}
 
-/* ── TOAST & CONFIRM ── */
-.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface2);border:1px solid var(--border2);border-radius:12px;padding:10px 20px;font-size:13px;font-weight:600;color:var(--text);z-index:9999;transition:transform .3s ease;white-space:nowrap;}
+/* ── AUTH ── */
+.auth-tabs{display:flex;gap:0;margin-bottom:20px;border-bottom:1px solid var(--border);}
+.auth-tab{background:none;border:none;cursor:pointer;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;padding:9px 18px;color:var(--muted);border-bottom:2px solid transparent;transition:all .2s;margin-bottom:-1px;}
+.auth-tab.active{color:var(--purple);border-bottom-color:var(--purple);}
+.auth-err{background:rgba(230,57,70,.1);border:1px solid rgba(230,57,70,.3);border-radius:8px;padding:9px 12px;font-size:11px;color:var(--red);margin-bottom:10px;display:none;}
+.auth-err.show{display:block;}
+.auth-info{background:rgba(46,196,182,.07);border:1px solid rgba(46,196,182,.2);border-radius:8px;padding:11px 13px;font-size:11px;color:var(--teal);margin-bottom:12px;line-height:1.6;}
+.sync-status-bar{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:10px 13px;margin-bottom:12px;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:7px;}
+
+/* ── TOAST / CONFIRM ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface2);border:1px solid var(--border2);border-radius:11px;padding:9px 18px;font-size:12px;font-weight:600;color:var(--text);z-index:9999;transition:transform .3s ease;white-space:nowrap;}
 .toast.show{transform:translateX(-50%) translateY(0);}
 .toast.ok{border-color:var(--teal);color:var(--teal);}
 .toast.err{border-color:var(--red);color:var(--red);}
-.conf-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(7px);z-index:600;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;}
+.conf-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:600;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .18s;}
 .conf-overlay.open{opacity:1;pointer-events:all;}
-.conf-box{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:26px;width:100%;max-width:340px;text-align:center;}
-.conf-title{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;margin-bottom:7px;}
-.conf-msg{font-size:13px;color:var(--muted);margin-bottom:22px;line-height:1.5;}
-.conf-btns{display:flex;gap:9px;}
+.conf-box{background:var(--surface);border:1px solid var(--border2);border-radius:15px;padding:24px;width:100%;max-width:320px;text-align:center;}
+.conf-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:6px;}
+.conf-msg{font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.5;}
+.conf-btns{display:flex;gap:8px;}
 
-/* ── AUTH MODAL ── */
-.auth-tabs{display:flex;gap:0;margin-bottom:22px;border-bottom:1px solid var(--border);}
-.auth-tab{background:none;border:none;cursor:pointer;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;padding:10px 20px;color:var(--muted);border-bottom:2px solid transparent;transition:all .2s;margin-bottom:-1px;}
-.auth-tab.active{color:var(--purple);border-bottom-color:var(--purple);}
-.auth-err{background:rgba(230,57,70,.1);border:1px solid rgba(230,57,70,.3);border-radius:9px;padding:10px 14px;font-size:12px;color:var(--red);margin-bottom:12px;display:none;}
-.auth-err.show{display:block;}
-.auth-info{background:rgba(46,196,182,.08);border:1px solid rgba(46,196,182,.25);border-radius:9px;padding:12px 14px;font-size:12px;color:var(--teal);margin-bottom:14px;line-height:1.6;}
-.auth-sep{text-align:center;font-size:11px;color:var(--dim);margin:14px 0;}
-.user-menu{padding:18px 0 0;}
-.user-avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--blue));display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto 10px;}
-.user-email{text-align:center;font-size:13px;color:var(--muted);margin-bottom:6px;}
-.user-name{text-align:center;font-family:'Playfair Display',serif;font-size:19px;font-weight:700;margin-bottom:18px;}
-.sync-status-bar{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;margin-bottom:14px;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px;}
-
-/* ── SCROLLBAR ── */
-::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar{width:4px;height:4px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:10px;}
-
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.5;}}
-@media(max-width:960px){.cal-layout{grid-template-columns:1fr;}.diary-layout{grid-template-columns:1fr;}.feat-wx{position:static;margin-top:16px;width:fit-content;}.container{padding:14px;}header{padding:11px 14px;}}
-@media(max-width:600px){.cd-row{gap:7px;}.cd-unit{padding:13px 15px;min-width:68px;}.cd-num{font-size:28px;}.logo{font-size:16px;}.frow{grid-template-columns:1fr;}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(7px);}to{opacity:1;transform:translateY(0);}}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+@keyframes shimmer{0%{opacity:.5;}50%{opacity:1;}100%{opacity:.5;}}
+@media(max-width:960px){.cal-layout{grid-template-columns:1fr;}.diary-layout{grid-template-columns:1fr;}.feat-wx{position:static;margin-top:14px;width:fit-content;}.container{padding:14px;}header{padding:9px 14px;}.feat-name{padding-right:0;}}
+@media(max-width:600px){.cd-row{gap:6px;}.cd-unit{padding:12px 14px;min-width:66px;}.cd-num{font-size:26px;}.logo{font-size:15px;}}
 </style>
 </head>
 <body>
 
 <div class="toast" id="toast"></div>
-
-<!-- CONFIRM -->
 <div class="conf-overlay" id="conf">
   <div class="conf-box">
-    <div class="conf-title">⚠️ Xác nhận xoá</div>
+    <div class="conf-title">⚠️ Xác nhận</div>
     <div class="conf-msg" id="conf-msg"></div>
     <div class="conf-btns">
       <button class="btn-s" onclick="closeConf()">Huỷ</button>
-      <button class="btn-danger" id="conf-yes">Xoá</button>
+      <button class="btn-danger" id="conf-yes">Xác nhận</button>
     </div>
   </div>
 </div>
 
-<!-- ADD/EDIT MODAL -->
+<!-- ADD/EDIT EVENT MODAL -->
 <div class="overlay" id="ov-form" onclick="bgClose(event,'ov-form')">
   <div class="modal">
     <div class="mhdr">
@@ -320,25 +359,36 @@ nav button.active{color:var(--gold);}
     </div>
     <div class="mbody">
       <input type="hidden" id="f-id">
-      <div class="frow" style="margin-bottom:11px;">
-        <div class="fgroup" style="margin:0;">
-          <label class="flabel">Tên sự kiện *</label>
-          <input type="text" class="finp" id="f-name" placeholder="VD: Sinh nhật bạn thân...">
-        </div>
-        <div class="fgroup" style="margin:0;">
-          <label class="flabel">Icon</label>
-          <input type="text" class="finp" id="f-icon" placeholder="⭐" maxlength="2" style="text-align:center;font-size:17px;">
-        </div>
+      <div class="frow2" style="margin-bottom:10px;">
+        <div class="fgroup" style="margin:0;"><label class="flabel">Tên sự kiện *</label><input type="text" class="finp" id="f-name" placeholder="VD: Sinh nhật, deadline..."></div>
+        <div class="fgroup" style="margin:0;"><label class="flabel">Icon</label><input type="text" class="finp" id="f-icon" placeholder="⭐" maxlength="2" style="text-align:center;font-size:16px;"></div>
       </div>
       <div class="fgroup">
         <label class="flabel">Ngày *</label>
         <input type="date" class="finp" id="f-date">
       </div>
+      <!-- Advanced time toggle -->
+      <label class="adv-time-toggle">
+        <input type="checkbox" id="adv-time-chk" onchange="toggleAdvTime()">
+        <span>⏱️ Đặt giờ cụ thể (giờ · phút · giây)</span>
+      </label>
+      <div class="adv-time-panel" id="adv-time-panel">
+        <div class="time-inputs">
+          <div class="time-unit"><label>GIỜ</label><input type="number" id="f-hour" min="0" max="23" value="0" placeholder="00"></div>
+          <div class="time-unit"><label>PHÚT</label><input type="number" id="f-min" min="0" max="59" value="0" placeholder="00"></div>
+          <div class="time-unit"><label>GIÂY</label><input type="number" id="f-sec" min="0" max="59" value="0" placeholder="00"></div>
+        </div>
+        <div style="font-size:10px;color:var(--muted);margin-top:8px;text-align:center;">Đếm ngược chính xác đến giây</div>
+      </div>
+      <div class="fgroup">
+        <label class="flabel">Tag *</label>
+        <select class="fsel" id="f-tag"></select>
+      </div>
       <div class="fgroup">
         <label class="flabel">📍 Địa điểm (hiển thị thời tiết dự báo)</label>
         <div class="finp-row">
-          <input type="text" class="finp" id="f-loc" placeholder="VD: Ho Chi Minh, Da Nang, Paris..." onkeydown="if(event.key==='Enter')prevLocWx()">
-          <button type="button" class="wxb-btn" onclick="prevLocWx()" style="border-radius:9px;padding:9px 12px;font-size:12px;">Kiểm tra</button>
+          <input type="text" class="finp" id="f-loc" placeholder="VD: Ho Chi Minh, Da Nang..." onkeydown="if(event.key==='Enter')prevLocWx()">
+          <button type="button" class="wxb-btn" onclick="prevLocWx()" style="border-radius:9px;">Kiểm tra</button>
         </div>
         <div class="loc-prev" id="loc-prev">
           <span class="lp-icon" id="lp-icon">🌤️</span>
@@ -347,9 +397,9 @@ nav button.active{color:var(--gold);}
       </div>
       <div class="fgroup">
         <label class="flabel">Ghi chú</label>
-        <textarea class="ftxt" id="f-note" rows="3" placeholder="Thông tin thêm về sự kiện..."></textarea>
+        <textarea class="ftxt" id="f-note" rows="3" placeholder="Thông tin thêm..."></textarea>
       </div>
-      <div class="mact-row" style="margin-top:6px;">
+      <div class="mact-row" style="margin-top:4px;">
         <button class="btn-s" onclick="closeOverlay('ov-form')">Huỷ</button>
         <button class="btn-p" id="form-save" onclick="saveEvent()">Lưu sự kiện</button>
       </div>
@@ -365,6 +415,53 @@ nav button.active{color:var(--gold);}
       <button class="mclose" onclick="closeOverlay('ov-detail')">✕</button>
     </div>
     <div class="mbody" id="detail-body"></div>
+  </div>
+</div>
+
+<!-- TAGS MANAGER MODAL -->
+<div class="overlay" id="ov-tags" onclick="bgClose(event,'ov-tags')">
+  <div class="modal modal-lg">
+    <div class="mhdr">
+      <div class="mtitle">🏷️ Quản lý Tag</div>
+      <button class="mclose" onclick="closeOverlay('ov-tags')">✕</button>
+    </div>
+    <div class="mbody">
+      <!-- Import shared tag -->
+      <div class="import-tag-box">
+        <div class="flabel">📥 Nhập tag được chia sẻ</div>
+        <div class="import-row">
+          <input type="text" class="finp" id="import-code" placeholder="Nhập mã chia sẻ (VD: A1B2C3D4)" style="text-transform:uppercase;letter-spacing:2px;font-weight:700;" oninput="this.value=this.value.toUpperCase()">
+          <button class="btn-teal" style="flex:none;padding:9px 16px;font-size:12px;" onclick="importSharedTag()">Nhập</button>
+        </div>
+      </div>
+
+      <!-- My tags -->
+      <div class="sec-label">Tag của bạn</div>
+      <div class="tags-grid" id="tags-grid"></div>
+
+      <!-- Add new tag -->
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;">
+        <div class="sec-label" style="margin-bottom:12px;">Tạo tag mới</div>
+        <div class="frow2" style="margin-bottom:10px;">
+          <div class="fgroup" style="margin:0;"><label class="flabel">Tên tag</label><input type="text" class="finp" id="new-tag-name" placeholder="VD: Công việc, Gia đình..."></div>
+          <div class="fgroup" style="margin:0;"><label class="flabel">Icon</label><input type="text" class="finp" id="new-tag-icon" placeholder="🏷️" maxlength="2" style="text-align:center;font-size:16px;"></div>
+        </div>
+        <div class="fgroup">
+          <label class="flabel">Màu sắc</label>
+          <div class="color-opts" id="color-opts">
+            <div class="color-opt sel" data-color="#9b72cf" style="background:#9b72cf;" onclick="pickColor(this)"></div>
+            <div class="color-opt" data-color="#e63946" style="background:#e63946;" onclick="pickColor(this)"></div>
+            <div class="color-opt" data-color="#f4a522" style="background:#f4a522;" onclick="pickColor(this)"></div>
+            <div class="color-opt" data-color="#2ec4b6" style="background:#2ec4b6;" onclick="pickColor(this)"></div>
+            <div class="color-opt" data-color="#4cc9f0" style="background:#4cc9f0;" onclick="pickColor(this)"></div>
+            <div class="color-opt" data-color="#f72585" style="background:#f72585;" onclick="pickColor(this)"></div>
+            <div class="color-opt" data-color="#52d48f" style="background:#52d48f;" onclick="pickColor(this)"></div>
+            <div class="color-opt" data-color="#ff9f1c" style="background:#ff9f1c;" onclick="pickColor(this)"></div>
+          </div>
+        </div>
+        <button class="btn-p" style="width:100%;margin-top:4px;" onclick="createTag()">+ Tạo tag</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -386,29 +483,29 @@ nav button.active{color:var(--gold);}
       <div class="mtitle" id="auth-modal-title">Tài khoản</div>
       <button class="mclose" onclick="closeOverlay('ov-auth')">✕</button>
     </div>
-    <div class="mbody" id="auth-modal-body">
-      <!-- filled by JS -->
-    </div>
+    <div class="mbody" id="auth-modal-body"></div>
   </div>
 </div>
 
 <!-- HEADER -->
 <header>
-  <div class="logo">🇻🇳 <span>Ngày Lễ</span> Việt Nam</div>
+  <div class="logo">🇻🇳 <span>Ngày Lễ</span> VN</div>
   <nav>
     <button class="active" onclick="showPage('countdown')">⏳ Đếm Ngược</button>
     <button onclick="showPage('calendar')">📅 Lịch</button>
     <button onclick="showPage('diary')">📔 Nhật Ký</button>
   </nav>
+  <div class="header-mid"></div>
   <div class="header-right">
+    <div class="clock-block">
+      <div class="clock-time" id="live-time">--:--:--</div>
+      <div class="clock-solar" id="live-date">--</div>
+      <div class="clock-lunar" id="live-lunar">🌙 -- / --</div>
+    </div>
     <button class="auth-btn" id="auth-header-btn" onclick="openAuthModal()">
       <span id="auth-sync-dot" class="sync-dot" style="display:none"></span>
       <span id="auth-header-label">🔑 Đăng nhập</span>
     </button>
-    <div class="header-time">
-      <strong id="live-time">--:--:--</strong>
-      <span id="live-date">--</span>
-    </div>
   </div>
 </header>
 
@@ -416,8 +513,26 @@ nav button.active{color:var(--gold);}
 
 <!-- ═══ COUNTDOWN ═══ -->
 <div id="page-countdown" class="page active">
-  <div class="section-label">Sự kiện sắp tới · <span id="ev-year-label"></span></div>
-  <div class="featured">
+  <!-- Daily quote -->
+  <div class="quote-bar" id="quote-bar">
+    <div class="quote-icon">💬</div>
+    <div><div class="quote-text" id="quote-text">Đang tải danh ngôn...</div><div class="quote-author" id="quote-author"></div></div>
+  </div>
+
+  <!-- Today events banner -->
+  <div class="today-banner" id="today-banner" style="display:none;">
+    <div class="today-banner-inner">
+      <div class="today-banner-hdr">
+        <span style="font-size:20px;">🎉</span>
+        <div class="today-banner-title">Sự kiện hôm nay!</div>
+        <div class="today-wish" id="today-wish"></div>
+      </div>
+      <div class="today-items" id="today-items"></div>
+    </div>
+  </div>
+
+  <!-- Featured -->
+  <div class="featured" id="feat-box">
     <div class="feat-label">🔥 Sắp diễn ra tiếp theo</div>
     <div class="feat-name" id="feat-name">Đang tải...</div>
     <div class="feat-sub" id="feat-sub"></div>
@@ -428,17 +543,16 @@ nav button.active{color:var(--gold);}
       <div class="cd-unit"><span class="cd-num" id="cd-s">--</span><span class="cd-lbl">Giây</span></div>
     </div>
     <div class="feat-wx" id="feat-wx">
-      <span class="feat-wx-icon" style="animation:pulse 1.5s infinite">⏳</span>
-      <div class="feat-wx-city">Thời tiết...</div>
+      <span class="feat-wx-icon" style="animation:shimmer 2s infinite">🌤️</span>
+      <div class="feat-wx-city" style="font-size:9px;color:var(--muted)">Thời tiết...</div>
     </div>
   </div>
-  <div class="tag-bar">
+
+  <div class="tag-bar" id="tag-bar">
     <button class="tb tb-all act" data-tag="all" onclick="fTag('all')">Tất cả</button>
-    <button class="tb tb-sol" data-tag="solar" onclick="fTag('solar')">☀️ Dương lịch</button>
-    <button class="tb tb-lun" data-tag="lunar" onclick="fTag('lunar')">🌙 Âm lịch</button>
-    <button class="tb tb-hol" data-tag="holiday" onclick="fTag('holiday')">🏖️ Nghỉ lễ</button>
-    <button class="tb tb-per" data-tag="personal" onclick="fTag('personal')">⭐ Cá nhân</button>
-    <button class="btn-new" onclick="openForm()">+ Thêm sự kiện</button>
+    <!-- dynamic tags injected here -->
+    <button class="btn-new-ev" onclick="openForm()">+ Thêm sự kiện</button>
+    <button class="btn-manage-tags" onclick="openTags()">🏷️ Tags</button>
   </div>
   <div class="evgrid" id="evgrid"></div>
 </div>
@@ -458,9 +572,9 @@ nav button.active{color:var(--gold);}
       </div>
     </div>
     <div class="wxb-ctrl">
-      <div class="wxb-cl">📍 Đổi địa điểm thời tiết</div>
+      <div class="wxb-cl">📍 Đổi địa điểm</div>
       <div class="wxb-row">
-        <input type="text" class="wxb-inp" id="wxb-loc" placeholder="Hà Nội, Đà Nẵng, Sài Gòn..." onkeydown="if(event.key==='Enter')changeMainWx()">
+        <input type="text" class="wxb-inp" id="wxb-loc" placeholder="Hà Nội, Đà Nẵng..." onkeydown="if(event.key==='Enter')changeMainWx()">
         <button class="wxb-btn" onclick="changeMainWx()">Cập nhật</button>
       </div>
       <div class="wxb-hint" id="wxb-hint"></div>
@@ -490,8 +604,8 @@ nav button.active{color:var(--gold);}
         <div class="dev-list" id="dev-list"><div class="no-ev">Nhấn vào một ngày</div></div>
       </div>
       <div class="sb-card">
-        <div class="sb-title">Sự kiện cá nhân</div>
-        <button class="btn-p" onclick="openForm(selDS())" style="width:100%;">+ Thêm sự kiện mới</button>
+        <div class="sb-title">Thêm nhanh</div>
+        <button class="btn-p" onclick="openForm(selDS())" style="width:100%;font-size:12px;">+ Thêm sự kiện vào ngày này</button>
       </div>
     </div>
   </div>
@@ -500,20 +614,15 @@ nav button.active{color:var(--gold);}
 <!-- ═══ DIARY ═══ -->
 <div id="page-diary" class="page">
   <div class="diary-layout">
-    <!-- LEFT: Write -->
     <div>
-      <div class="sb-card" style="margin-bottom:16px;">
+      <div class="sb-card" style="margin-bottom:14px;">
         <div class="sb-title">✍️ Ghi chép hôm nay</div>
         <div class="diary-date-bar">
-          <div>
-            <div class="diary-date-lbl" id="diary-today-date"></div>
-            <div class="diary-date-lun" id="diary-today-lun"></div>
-          </div>
-          <div id="diary-today-mood-show" style="font-size:28px;"></div>
+          <div><div class="diary-date-lbl" id="diary-today-date"></div><div class="diary-date-lun" id="diary-today-lun"></div></div>
+          <div id="diary-today-mood-show" style="font-size:26px;"></div>
         </div>
-        <!-- Mood picker -->
-        <div style="margin-bottom:12px;">
-          <div class="flabel" style="margin-bottom:8px;">Tâm trạng hôm nay</div>
+        <div style="margin-bottom:11px;">
+          <div class="flabel" style="margin-bottom:7px;">Tâm trạng hôm nay</div>
           <div class="mood-picker" id="mood-picker">
             <button class="mood-btn" data-mood="😊" onclick="pickMood(this)"><span>😊</span><span class="mood-name">Vui</span></button>
             <button class="mood-btn" data-mood="🥰" onclick="pickMood(this)"><span>🥰</span><span class="mood-name">Yêu</span></button>
@@ -523,32 +632,29 @@ nav button.active{color:var(--gold);}
             <button class="mood-btn" data-mood="😔" onclick="pickMood(this)"><span>😔</span><span class="mood-name">Buồn</span></button>
             <button class="mood-btn" data-mood="😤" onclick="pickMood(this)"><span>😤</span><span class="mood-name">Bực bội</span></button>
             <button class="mood-btn" data-mood="😩" onclick="pickMood(this)"><span>😩</span><span class="mood-name">Mệt mỏi</span></button>
-            <button class="mood-btn" data-mood="🤒" onclick="pickMood(this)"><span>🤒</span><span class="mood-name">Ốm</span></button>
             <button class="mood-btn" data-mood="🥳" onclick="pickMood(this)"><span>🥳</span><span class="mood-name">Phấn khích</span></button>
+            <button class="mood-btn" data-mood="🤒" onclick="pickMood(this)"><span>🤒</span><span class="mood-name">Ốm</span></button>
             <button class="mood-btn" data-mood="😴" onclick="pickMood(this)"><span>😴</span><span class="mood-name">Buồn ngủ</span></button>
             <button class="mood-btn" data-mood="🤩" onclick="pickMood(this)"><span>🤩</span><span class="mood-name">Xuất sắc</span></button>
           </div>
         </div>
-        <div class="flabel" style="margin-bottom:8px;">Ghi chú hôm nay</div>
-        <textarea class="diary-textarea" id="diary-text" placeholder="Hôm nay bạn có gì muốn chia sẻ? Điều gì đặc biệt xảy ra? Cảm xúc của bạn thế nào?&#10;&#10;Viết ra đây, và bạn sẽ luôn có thể đọc lại sau này..." oninput="onDiaryInput()"></textarea>
+        <div class="flabel" style="margin-bottom:7px;">Ghi chú hôm nay</div>
+        <textarea class="diary-textarea" id="diary-text" placeholder="Hôm nay bạn có gì muốn chia sẻ?&#10;&#10;Viết ra đây, và bạn sẽ luôn có thể đọc lại sau này..." oninput="onDiaryInput()"></textarea>
         <div class="diary-save-bar">
           <span class="diary-chars" id="diary-chars">0 ký tự</span>
-          <div style="display:flex;align-items:center;gap:10px;">
+          <div style="display:flex;align-items:center;gap:9px;">
             <span class="diary-saved-badge" id="diary-saved">✓ Đã lưu</span>
-            <button class="btn-p" onclick="saveDiary()" style="padding:8px 18px;font-size:12px;">💾 Lưu</button>
+            <button class="btn-p" onclick="saveDiary()" style="padding:7px 16px;font-size:11px;">💾 Lưu</button>
           </div>
         </div>
       </div>
     </div>
-    <!-- RIGHT: History -->
     <div>
       <div class="sb-card" style="background:transparent;border:none;padding:0;">
-        <div class="sb-title" style="margin-bottom:12px;">📚 Nhật ký của bạn</div>
+        <div class="sb-title" style="margin-bottom:10px;">📚 Nhật ký của bạn</div>
         <div class="diary-stats" id="diary-stats"></div>
         <input type="text" class="diary-search" id="diary-search" placeholder="🔍 Tìm kiếm nhật ký..." oninput="renderDiaryList()">
-        <div class="diary-filter-bar" id="diary-filter-bar">
-          <button class="mf-btn act" data-mf="all" onclick="setMoodFilter('all')">Tất cả</button>
-        </div>
+        <div class="diary-filter-bar" id="diary-filter-bar"></div>
         <div class="diary-entries" id="diary-list"></div>
       </div>
     </div>
@@ -559,12 +665,12 @@ nav button.active{color:var(--gold);}
 
 <script>
 // ══════════════════════════════════════════════════════════
-// CONFIG — set your backend URL here
+// CONFIG
 // ══════════════════════════════════════════════════════════
-const API_URL = 'https://dem-nguoc-ngay-backend.onrender.com'; // ← Change this after deploying backend
+const API_URL = 'https://dem-nguoc-ngay-backend.onrender.com'; // ← thay bằng URL backend sau khi deploy
 
 // ══════════════════════════════════════════════════════════
-// LUNAR CALENDAR (full algorithm, works any year)
+// LUNAR CALENDAR
 // ══════════════════════════════════════════════════════════
 const LC={
   jd(d,m,y){let a=Math.floor((14-m)/12),yy=y+4800-a,mm=m+12*a-3,v=d+Math.floor((153*mm+2)/5)+365*yy+Math.floor(yy/4)-Math.floor(yy/100)+Math.floor(yy/400)-32045;return v<2299161?d+Math.floor((153*mm+2)/5)+365*yy+Math.floor(yy/4)-32083:v;},
@@ -573,413 +679,752 @@ const LC={
   lm11(y,tz){let k=Math.floor((this.jd(31,12,y)-2415021)/29.530588853),n=this.nm(k,tz);return this.sl(n,tz)>=9?this.nm(k-1,tz):n;},
   loff(a11,tz){let k=Math.floor((a11-2415021.076998695)/29.530588853+0.5),arc=this.sl(this.nm(k+1,tz),tz),last,i=1;do{last=arc;k++;arc=this.sl(this.nm(k+1,tz),tz);i++;}while(arc!==last&&i<14);return i-1;},
   s2l(d,m,y,tz=7){let dn=this.jd(d,m,y),k=Math.floor((dn-2415021.076998695)/29.530588853),ms=this.nm(k+1,tz);if(ms>dn)ms=this.nm(k,tz);let a11=this.lm11(y,tz),b11=a11,ly;if(a11>=ms){ly=y;a11=this.lm11(y-1,tz);}else{ly=y+1;b11=this.lm11(y+1,tz);}let ld=dn-ms+1,df=Math.floor((ms-a11)/29),ll=0,lm=df+11;if(b11-a11>365){let lo=this.loff(a11,tz);if(df>=lo){lm=df+10;if(df===lo)ll=1;}}if(lm>12)lm-=12;if(lm>=11&&df<4)ly--;return[ld,lm,ly,ll];},
-  l2s(ld,lm,tz=7){const y=new Date().getFullYear();for(let yr=y-1;yr<=y+2;yr++){for(let mo=1;mo<=12;mo++){const maxd=new Date(yr,mo,0).getDate();for(let d=1;d<=maxd;d++){const[a,b]=this.s2l(d,mo,yr,tz);if(a===ld&&b===lm)return new Date(yr,mo-1,d);}}}return null;},
   l2sYear(ld,lm,yr,tz=7){for(let mo=1;mo<=12;mo++){const maxd=new Date(yr,mo,0).getDate();for(let d=1;d<=maxd;d++){const[a,b]=this.s2l(d,mo,yr,tz);if(a===ld&&b===lm)return new Date(yr,mo-1,d);}}return null;}
 };
 
 // ══════════════════════════════════════════════════════════
-// SYSTEM EVENTS
+// CONTENT FILES (embedded - loaded once)
+// ══════════════════════════════════════════════════════════
+let WISHES = [];
+let QUOTES = [];
+
+async function loadContentFiles() {
+  try {
+    const [wr, qr] = await Promise.all([
+      fetch('wish.txt').then(r=>r.text()).catch(()=>''),
+      fetch('famous_quotes.txt').then(r=>r.text()).catch(()=>'')
+    ]);
+    WISHES = wr.split('\n').map(s=>s.trim()).filter(Boolean);
+    QUOTES = qr.split('\n\\').map(s=>s.replace(/^\\/,'').trim()).filter(Boolean);
+  } catch(e) { console.warn('Content files not loaded'); }
+}
+
+function getDailyQuote() {
+  if (!QUOTES.length) return null;
+  const idx = Math.floor(Date.now() / 86400000) % QUOTES.length;
+  return QUOTES[idx];
+}
+
+function getRandomWish() {
+  if (!WISHES.length) return 'Chúc mừng sự kiện đã đến! 🎉';
+  return WISHES[Math.floor(Math.random() * WISHES.length)];
+}
+
+// ══════════════════════════════════════════════════════════
+// SYSTEM EVENTS (fixed holidays — computed any year)
 // ══════════════════════════════════════════════════════════
 const SYS_DEFS = [
-  {id:'ny',    name:'Tết Dương Lịch',            tag:'holiday',  icon:'🎆', getDate:y=>new Date(y,0,1)},
-  {id:'430',   name:'Ngày Giải Phóng 30/4',      tag:'holiday',  icon:'🎖️', getDate:y=>new Date(y,3,30)},
-  {id:'may1',  name:'Quốc tế Lao Động 1/5',      tag:'holiday',  icon:'⚒️', getDate:y=>new Date(y,4,1)},
-  {id:'sep2',  name:'Quốc Khánh 2/9',            tag:'holiday',  icon:'🇻🇳', getDate:y=>new Date(y,8,2)},
-  {id:'hung',  name:'Giỗ Tổ Hùng Vương',         tag:'holiday',  icon:'👑', note:'10/3 Âm lịch', getDate:y=>LC.l2sYear(10,3,y)||new Date(y,3,18)},
-  {id:'giaothua', name:'Giao Thừa',              tag:'lunar',    icon:'🎇', note:'30 tháng Chạp', getDate:y=>LC.l2sYear(30,12,y-1)||LC.l2sYear(29,12,y-1)},
-  {id:'tet1',  name:'Mùng 1 Tết Nguyên Đán',     tag:'lunar',    icon:'🧧', note:'Tết Nguyên Đán', getDate:y=>LC.l2sYear(1,1,y)},
-  {id:'tet2',  name:'Mùng 2 Tết',                tag:'lunar',    icon:'🏮', note:'Mùng 2 tháng Giêng', getDate:y=>LC.l2sYear(2,1,y)},
-  {id:'tet3',  name:'Mùng 3 Tết',                tag:'lunar',    icon:'🧧', note:'Mùng 3 tháng Giêng', getDate:y=>LC.l2sYear(3,1,y)},
-  {id:'ram1',  name:'Rằm tháng Giêng',           tag:'lunar',    icon:'🏮', note:'Tết Nguyên Tiêu', getDate:y=>LC.l2sYear(15,1,y)},
-  {id:'tao',   name:'Ông Táo về trời',            tag:'lunar',    icon:'🔥', note:'23 tháng Chạp', getDate:y=>LC.l2sYear(23,12,y-1)},
-  {id:'thanh', name:'Tết Thanh Minh',             tag:'solar',    icon:'🪦', getDate:y=>new Date(y,3,4)},
-  {id:'doan',  name:'Tết Đoan Ngọ',              tag:'lunar',    icon:'🍑', note:'5/5 Âm lịch', getDate:y=>LC.l2sYear(5,5,y)},
-  {id:'vulan', name:'Lễ Vu Lan',                 tag:'lunar',    icon:'🪷', note:'Rằm tháng 7', getDate:y=>LC.l2sYear(15,7,y)},
-  {id:'trungth',name:'Tết Trung Thu',            tag:'lunar',    icon:'🥮', note:'Rằm tháng 8', getDate:y=>LC.l2sYear(15,8,y)},
-  {id:'ram12', name:'Rằm tháng Chạp',            tag:'lunar',    icon:'🌕', note:'Rằm tháng 12 Âm lịch', getDate:y=>LC.l2sYear(15,12,y)},
-  {id:'val',   name:'Valentine',                 tag:'solar',    icon:'💝', getDate:y=>new Date(y,1,14)},
-  {id:'pnqt',  name:'Ngày Phụ nữ Quốc tế 8/3',  tag:'solar',    icon:'🌸', getDate:y=>new Date(y,2,8)},
-  {id:'pnvn',  name:'Ngày Phụ nữ Việt Nam 20/10',tag:'solar',    icon:'🌺', getDate:y=>new Date(y,9,20)},
-  {id:'hween', name:'Halloween',                 tag:'solar',    icon:'🎃', getDate:y=>new Date(y,9,31)},
-  {id:'gv',    name:'Ngày Nhà Giáo 20/11',       tag:'solar',    icon:'📚', getDate:y=>new Date(y,10,20)},
-  {id:'xmas',  name:'Giáng Sinh',                tag:'solar',    icon:'🎄', getDate:y=>new Date(y,11,25)},
-  {id:'tdvn',  name:'Ngày Thầy thuốc VN 27/2',   tag:'solar',    icon:'⚕️', getDate:y=>new Date(y,1,27)},
-  {id:'ldvn',  name:'Ngày Thành lập Đảng 3/2',   tag:'solar',    icon:'🏛️', getDate:y=>new Date(y,1,3)},
+  {id:'ny',    name:'Tết Dương Lịch',        tag:'holiday', icon:'🎆', getDate:y=>new Date(y,0,1)},
+  {id:'430',   name:'Ngày Giải Phóng 30/4',  tag:'holiday', icon:'🎖️', getDate:y=>new Date(y,3,30)},
+  {id:'may1',  name:'Quốc tế Lao Động 1/5',  tag:'holiday', icon:'⚒️', getDate:y=>new Date(y,4,1)},
+  {id:'sep2',  name:'Quốc Khánh 2/9',         tag:'holiday', icon:'🇻🇳', getDate:y=>new Date(y,8,2)},
+  {id:'hung',  name:'Giỗ Tổ Hùng Vương',      tag:'holiday', icon:'👑', note:'10/3 Âm lịch', getDate:y=>LC.l2sYear(10,3,y)||new Date(y,3,18)},
+  {id:'giaothua',name:'Giao Thừa',            tag:'lunar',  icon:'🎇', note:'30 tháng Chạp', getDate:y=>{const d=LC.l2sYear(30,12,y-1);if(d){const r=new Date(d);r.setHours(23,59,59,0);return r;}return null;}},
+  {id:'tet1',  name:'Mùng 1 Tết Nguyên Đán', tag:'lunar',  icon:'🧧', note:'Tết Nguyên Đán', getDate:y=>LC.l2sYear(1,1,y)},
+  {id:'tet2',  name:'Mùng 2 Tết',             tag:'lunar',  icon:'🏮', getDate:y=>LC.l2sYear(2,1,y)},
+  {id:'tet3',  name:'Mùng 3 Tết',             tag:'lunar',  icon:'🧧', getDate:y=>LC.l2sYear(3,1,y)},
+  {id:'ram1',  name:'Rằm tháng Giêng',        tag:'lunar',  icon:'🏮', note:'Tết Nguyên Tiêu', getDate:y=>LC.l2sYear(15,1,y)},
+  {id:'tao',   name:'Ông Táo về trời',         tag:'lunar',  icon:'🔥', note:'23 tháng Chạp', getDate:y=>LC.l2sYear(23,12,y-1)},
+  {id:'thanh', name:'Tết Thanh Minh',          tag:'solar',  icon:'🪦', getDate:y=>new Date(y,3,4)},
+  {id:'doan',  name:'Tết Đoan Ngọ',           tag:'lunar',  icon:'🍑', note:'5/5 Âm lịch', getDate:y=>LC.l2sYear(5,5,y)},
+  {id:'vulan', name:'Lễ Vu Lan',              tag:'lunar',  icon:'🪷', note:'Rằm tháng 7', getDate:y=>LC.l2sYear(15,7,y)},
+  {id:'trungth',name:'Tết Trung Thu',         tag:'lunar',  icon:'🥮', note:'Rằm tháng 8', getDate:y=>LC.l2sYear(15,8,y)},
+  {id:'val',   name:'Valentine',              tag:'solar',  icon:'💝', getDate:y=>new Date(y,1,14)},
+  {id:'pnqt',  name:'Phụ nữ Quốc tế 8/3',    tag:'solar',  icon:'🌸', getDate:y=>new Date(y,2,8)},
+  {id:'pnvn',  name:'Phụ nữ Việt Nam 20/10', tag:'solar',  icon:'🌺', getDate:y=>new Date(y,9,20)},
+  {id:'hween', name:'Halloween',              tag:'solar',  icon:'🎃', getDate:y=>new Date(y,9,31)},
+  {id:'gv',    name:'Nhà Giáo Việt Nam 20/11',tag:'solar',  icon:'📚', getDate:y=>new Date(y,10,20)},
+  {id:'xmas',  name:'Giáng Sinh',             tag:'solar',  icon:'🎄', getDate:y=>new Date(y,11,25)},
 ];
 
-function getSysForYears(fromYear, toYear){
-  const evs=[];
-  for(let yr=fromYear;yr<=toYear;yr++){
-    SYS_DEFS.forEach(def=>{try{const d=def.getDate(yr);if(d&&!isNaN(d))evs.push({...def,date:d,year:yr,isSys:true});}catch(e){}}); 
+// Tag colors for system tags
+const SYS_TAG_COLORS = { solar:'#f4a522', lunar:'#f4a522', holiday:'#2ec4b6', personal:'#9b72cf' };
+const SYS_TAG_ICONS  = { solar:'☀️', lunar:'🌙', holiday:'🏖️', personal:'⭐' };
+
+function getSysForRange(fromY, toY) {
+  const evs = [];
+  for (let yr = fromY; yr <= toY; yr++) {
+    SYS_DEFS.forEach(def => {
+      try { const d = def.getDate(yr); if (d && !isNaN(d)) evs.push({...def, date:d, year:yr, isSys:true}); }
+      catch(e){}
+    });
   }
   return evs;
 }
 
 // ══════════════════════════════════════════════════════════
-// AUTH STATE
+// STATE
 // ══════════════════════════════════════════════════════════
 let authToken = localStorage.getItem('auth_token') || null;
-let authUser = JSON.parse(localStorage.getItem('auth_user') || 'null');
-let syncStatus = 'idle'; // idle | syncing | error | ok
+let authUser  = JSON.parse(localStorage.getItem('auth_user') || 'null');
+let syncStatus = 'idle';
 
+let customEvents = loadCustomLocal();
+let customTags   = loadTagsLocal();
+let diary        = loadDiaryLocal();
+let mainLoc      = localStorage.getItem('wx_loc') || 'Hanoi';
+let allEvents    = [];
+let curFilter    = 'all';
+let calYear      = new Date().getFullYear();
+let calMonth     = new Date().getMonth();
+let selDate      = new Date();
+let wxCache      = {};
+let editingId    = null;
+let selectedMood = '';
+let moodFilter   = 'all';
+let selectedColor = '#9b72cf';
+let _detailTimer = null;
+
+// ── Local storage helpers ──
+function loadCustomLocal(){
+  try { return JSON.parse(localStorage.getItem('vn_evts')||'[]').map(e=>({...e,date:new Date(e.date)})); }
+  catch { return []; }
+}
+function loadTagsLocal(){
+  try {
+    const t = JSON.parse(localStorage.getItem('vn_tags')||'[]');
+    return t.length ? t : getDefaultTags();
+  } catch { return getDefaultTags(); }
+}
+function loadDiaryLocal(){ try { return JSON.parse(localStorage.getItem('vn_diary')||'{}'); } catch { return {}; } }
+function getDefaultTags(){
+  return [
+    {id:'personal', name:'Cá nhân',  color:'#9b72cf', icon:'⭐'},
+    {id:'work',     name:'Công việc', color:'#4cc9f0', icon:'💼'},
+    {id:'family',   name:'Gia đình',  color:'#52d48f', icon:'🏠'},
+  ];
+}
+
+function saveCustomLocal(){ localStorage.setItem('vn_evts', JSON.stringify(customEvents.map(e=>({...e,date:e.date.toISOString()})))); }
+function saveTagsLocal(){ localStorage.setItem('vn_tags', JSON.stringify(customTags)); }
+function saveDiaryLocal(){ localStorage.setItem('vn_diary', JSON.stringify(diary)); }
+function saveWxLocLocal(l){ localStorage.setItem('wx_loc', l); }
+
+// ══════════════════════════════════════════════════════════
+// AUTH / SYNC
+// ══════════════════════════════════════════════════════════
 function isLoggedIn(){ return !!authToken && !!authUser; }
 
 function setSyncStatus(s){
-  syncStatus=s;
-  const dot=document.getElementById('auth-sync-dot');
-  const btn=document.getElementById('auth-header-btn');
-  if(!dot||!btn)return;
-  if(!isLoggedIn()){dot.style.display='none';btn.className='auth-btn';btn.querySelector('#auth-header-label').textContent='🔑 Đăng nhập';return;}
-  dot.style.display='inline-block';
-  dot.className='sync-dot'+(s==='syncing'?' syncing':s==='error'?' error':'');
-  btn.className='auth-btn logged';
-  const email=authUser?.email||'';
-  const short=email.split('@')[0];
-  btn.querySelector('#auth-header-label').textContent=`👤 ${short}`;
+  syncStatus = s;
+  const dot = document.getElementById('auth-sync-dot');
+  const btn = document.getElementById('auth-header-btn');
+  const lbl = document.getElementById('auth-header-label');
+  if (!dot || !btn) return;
+  if (!isLoggedIn()){ dot.style.display='none'; btn.className='auth-btn'; lbl.textContent='🔑 Đăng nhập'; return; }
+  dot.style.display = 'inline-block';
+  dot.className = 'sync-dot' + (s==='syncing'?' syncing': s==='err'?' err':'');
+  btn.className = 'auth-btn logged';
+  lbl.textContent = '👤 ' + (authUser.email||'').split('@')[0];
 }
 
 async function apiCall(method, path, body=null, withAuth=true){
-  const headers={'Content-Type':'application/json'};
-  if(withAuth&&authToken) headers['Authorization']=`Bearer ${authToken}`;
-  const opts={method,headers};
-  if(body) opts.body=JSON.stringify(body);
-  const r=await fetch(API_URL+path,opts);
-  const data=await r.json();
-  if(!r.ok) throw new Error(data.error||'Lỗi kết nối');
+  const headers = {'Content-Type':'application/json'};
+  if (withAuth && authToken) headers['Authorization'] = `Bearer ${authToken}`;
+  const opts = {method, headers};
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch(API_URL + path, opts);
+  const data = await r.json();
+  if (!r.ok) throw new Error(data.error || 'Lỗi kết nối');
   return data;
 }
 
-// ══════════════════════════════════════════════════════════
-// STATE
-// ══════════════════════════════════════════════════════════
-let customEvents = loadCustom();
-let diary = loadDiary();
-let allEvents = [];
-let curFilter = 'all';
-let calYear = new Date().getFullYear();
-let calMonth = new Date().getMonth();
-let selDate = new Date();
-let wxCache = {};
-let mainLoc = loadWxLoc();
-let editingId = null;
-let selectedMood = '';
-let moodFilter = 'all';
-
-function loadWxLoc(){ return localStorage.getItem('wx_loc')||'Hanoi'; }
-function saveWxLocLocal(loc){ localStorage.setItem('wx_loc',loc); }
-function loadCustom(){try{return JSON.parse(localStorage.getItem('vn_evts')||'[]').map(e=>({...e,date:new Date(e.date)}));}catch{return[];}}
-function saveCustomLocal(){localStorage.setItem('vn_evts',JSON.stringify(customEvents.map(e=>({...e,date:e.date.toISOString()}))));}
-function loadDiary(){try{return JSON.parse(localStorage.getItem('vn_diary')||'{}');}catch{return{};}}
-function saveDiaryLocal(){localStorage.setItem('vn_diary',JSON.stringify(diary));}
-
-// ── Persistent save: local + server if logged in ──
-async function saveCustom(){
-  saveCustomLocal();
-  if(isLoggedIn()){
-    try{
-      setSyncStatus('syncing');
-      await apiCall('PATCH','/api/data/events',{customEvents:customEvents.map(e=>({...e,date:e.date.toISOString()}))});
-      setSyncStatus('ok');
-    }catch(e){setSyncStatus('error');console.warn('Sync events failed:',e);}
-  }
-}
-async function saveDiaryStore(){
-  saveDiaryLocal();
-  if(isLoggedIn()){
-    try{
-      setSyncStatus('syncing');
-      await apiCall('PATCH','/api/data/diary',{diary});
-      setSyncStatus('ok');
-    }catch(e){setSyncStatus('error');console.warn('Sync diary failed:',e);}
-  }
-}
-async function saveWxLoc(loc){
-  saveWxLocLocal(loc);
-  if(isLoggedIn()){
-    try{ await apiCall('PATCH','/api/data/wxloc',{wxLoc:loc}); }catch(e){console.warn('Sync wxloc failed:',e);}
-  }
-}
-
-// ── Load data from server ──
 async function loadServerData(){
-  if(!isLoggedIn())return;
+  if (!isLoggedIn()) return;
   setSyncStatus('syncing');
-  try{
-    const d=await apiCall('GET','/api/data');
-    // Merge: server is authoritative after login
-    if(d.customEvents){
-      customEvents=d.customEvents.map(e=>({...e,date:new Date(e.date)}));
-      saveCustomLocal();
-    }
-    if(d.diary){diary=d.diary;saveDiaryLocal();}
-    if(d.wxLoc){mainLoc=d.wxLoc;saveWxLocLocal(d.wxLoc);}
+  try {
+    const d = await apiCall('GET', '/api/data');
+    if (d.customEvents){ customEvents = d.customEvents.map(e=>({...e,date:new Date(e.date)})); saveCustomLocal(); }
+    if (d.customTags && d.customTags.length){ customTags = d.customTags; saveTagsLocal(); }
+    if (d.diary){ diary = d.diary; saveDiaryLocal(); }
+    if (d.wxLoc){ mainLoc = d.wxLoc; saveWxLocLocal(d.wxLoc); }
     setSyncStatus('ok');
-    rebuild();renderCountdown();renderCalendar();
-    if(document.getElementById('page-diary').classList.contains('active'))initDiary();
-    toast('✓ Dữ liệu đã đồng bộ từ máy chủ','ok');
-  }catch(e){
-    setSyncStatus('error');
-    toast('Không thể đồng bộ dữ liệu','err');
-  }
+    refreshAll();
+    toast('✓ Dữ liệu đã đồng bộ', 'ok');
+  } catch(e){ setSyncStatus('err'); toast('Không thể đồng bộ dữ liệu','err'); }
 }
 
-// ── Push local data to server (called right after first login) ──
-async function pushLocalDataToServer(){
-  try{
+async function pushLocalToServer(){
+  try {
     setSyncStatus('syncing');
-    // Fetch server data first to merge
-    const serverData=await apiCall('GET','/api/data');
-    // Merge custom events: combine both, deduplicate by id
-    const serverEvts=(serverData.customEvents||[]).map(e=>({...e,date:new Date(e.date)}));
-    const localEvts=customEvents;
-    const merged=[...serverEvts];
-    localEvts.forEach(le=>{if(!merged.find(se=>se.id===le.id))merged.push(le);});
-    // Merge diary: combine keys, server wins on conflict
-    const mergedDiary={...diary,...(serverData.diary||{})};
-    const mergedLoc=serverData.wxLoc||mainLoc;
-
-    // Push merged back to server
+    const server = await apiCall('GET','/api/data');
+    const sEvts = (server.customEvents||[]).map(e=>({...e,date:new Date(e.date)}));
+    const merged = [...sEvts];
+    customEvents.forEach(le=>{ if(!merged.find(se=>se.id===le.id)) merged.push(le); });
+    const mergedDiary = {...diary, ...(server.diary||{})};
+    const mergedTags = server.customTags && server.customTags.length ? server.customTags : customTags;
+    const mergedLoc = server.wxLoc || mainLoc;
     await apiCall('PUT','/api/data',{
-      customEvents:merged.map(e=>({...e,date:e.date.toISOString()})),
-      diary:mergedDiary,
-      wxLoc:mergedLoc
+      customEvents: merged.map(e=>({...e,date:e.date.toISOString()})),
+      customTags: mergedTags, diary: mergedDiary, wxLoc: mergedLoc
     });
+    customEvents=merged; diary=mergedDiary; customTags=mergedTags; mainLoc=mergedLoc;
+    saveCustomLocal(); saveDiaryLocal(); saveTagsLocal(); saveWxLocLocal(mergedLoc);
+    setSyncStatus('ok'); refreshAll(); toast('✓ Dữ liệu đã đồng bộ','ok');
+  } catch(e){ setSyncStatus('err'); toast('Lỗi đồng bộ','err'); console.error(e); }
+}
 
-    // Update local state
-    customEvents=merged;diary=mergedDiary;mainLoc=mergedLoc;
-    saveCustomLocal();saveDiaryLocal();saveWxLocLocal(mergedLoc);
-    setSyncStatus('ok');
-    rebuild();renderCountdown();renderCalendar();
-    if(document.getElementById('page-diary').classList.contains('active'))initDiary();
-    toast('✓ Dữ liệu đã được đồng bộ','ok');
-  }catch(e){
-    setSyncStatus('error');
-    toast('Lỗi đồng bộ dữ liệu','err');
-    console.error('Push local data error:',e);
+async function syncCustom(){
+  saveCustomLocal();
+  if (isLoggedIn()) {
+    try { setSyncStatus('syncing'); await apiCall('PATCH','/api/data/events',{customEvents:customEvents.map(e=>({...e,date:e.date.toISOString()}))}); setSyncStatus('ok'); }
+    catch(e){ setSyncStatus('err'); }
+  }
+}
+async function syncTags(){
+  saveTagsLocal();
+  if (isLoggedIn()) {
+    try { await apiCall('PATCH','/api/data/tags',{customTags}); }
+    catch(e){ console.warn('sync tags failed',e); }
+  }
+}
+async function syncDiary(){
+  saveDiaryLocal();
+  if (isLoggedIn()) {
+    try { await apiCall('PATCH','/api/data/diary',{diary}); }
+    catch(e){ console.warn('sync diary failed',e); }
+  }
+}
+async function syncWxLoc(loc){
+  saveWxLocLocal(loc);
+  if (isLoggedIn()) {
+    try { await apiCall('PATCH','/api/data/wxloc',{wxLoc:loc}); }
+    catch(e){ console.warn('sync wxloc failed',e); }
   }
 }
 
-function rebuild(){
-  const now=new Date();const yr=now.getFullYear();
-  const sys=getSysForYears(yr,yr+1);
-  allEvents=[...sys,...customEvents].filter(e=>e.date&&!isNaN(e.date)).sort((a,b)=>a.date-b.date);
-  const el=document.getElementById('ev-year-label');
-  if(el)el.textContent=`${yr}–${yr+1}`;
+async function verifyToken(){
+  if (!authToken) return;
+  try {
+    const d = await apiCall('GET','/api/auth/me');
+    authUser = d.user; localStorage.setItem('auth_user', JSON.stringify(authUser));
+    setSyncStatus('ok'); await loadServerData();
+  } catch(e){
+    authToken=null; authUser=null;
+    localStorage.removeItem('auth_token'); localStorage.removeItem('auth_user');
+    setSyncStatus('idle');
+  }
 }
 
 // ══════════════════════════════════════════════════════════
 // AUTH MODAL
 // ══════════════════════════════════════════════════════════
-function openAuthModal(){
-  renderAuthModal();
-  openOverlay('ov-auth');
-}
+function openAuthModal(){ renderAuthModal(); openOverlay('ov-auth'); }
 
 function renderAuthModal(){
-  const body=document.getElementById('auth-modal-body');
-  if(isLoggedIn()){
-    document.getElementById('auth-modal-title').textContent='Tài khoản';
-    body.innerHTML=`
-      <div class="user-menu">
-        <div class="user-avatar">👤</div>
-        <div class="user-name">Xin chào!</div>
-        <div class="user-email">${authUser.email}</div>
-        <div class="sync-status-bar">
-          <span class="sync-dot ${syncStatus==='syncing'?'syncing':syncStatus==='error'?'error':''}"></span>
-          <span>${syncStatus==='syncing'?'Đang đồng bộ...':syncStatus==='error'?'Lỗi đồng bộ':'Đã đồng bộ'}</span>
-          <button class="wxb-btn" style="margin-left:auto;padding:4px 10px;font-size:11px;" onclick="loadServerData()">🔄 Tải lại</button>
-        </div>
-        <div style="margin-bottom:14px;font-size:12px;color:var(--muted);">Dữ liệu được tự động đồng bộ giữa các thiết bị khi bạn đăng nhập.</div>
-        <div id="cpw-section">
-          <div class="flabel" style="margin-bottom:10px;">Đổi mật khẩu</div>
-          <div class="fgroup"><input type="password" class="finp" id="cp-old" placeholder="Mật khẩu hiện tại"></div>
-          <div class="fgroup"><input type="password" class="finp" id="cp-new" placeholder="Mật khẩu mới (ít nhất 6 ký tự)"></div>
-          <div class="auth-err" id="cp-err"></div>
-          <button class="btn-s" style="width:100%;margin-bottom:8px;" onclick="changePassword()">Đổi mật khẩu</button>
-        </div>
-        <div class="mact-row">
-          <button class="btn-s" onclick="closeOverlay('ov-auth')">Đóng</button>
-          <button class="btn-danger" onclick="logout()">🚪 Đăng xuất</button>
-        </div>
+  const body = document.getElementById('auth-modal-body');
+  if (isLoggedIn()){
+    document.getElementById('auth-modal-title').textContent = 'Tài khoản';
+    body.innerHTML = `
+      <div style="text-align:center;margin-bottom:16px;">
+        <div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--blue));display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 10px;">👤</div>
+        <div style="font-size:12px;color:var(--muted);">${authUser.email}</div>
+      </div>
+      <div class="sync-status-bar">
+        <span class="sync-dot ${syncStatus==='syncing'?'syncing':syncStatus==='err'?'err':''}"></span>
+        <span>${syncStatus==='syncing'?'Đang đồng bộ...':syncStatus==='err'?'Lỗi đồng bộ':'Đã đồng bộ'}</span>
+        <button class="wxb-btn" style="margin-left:auto;padding:3px 9px;font-size:10px;" onclick="loadServerData()">🔄 Tải lại</button>
+      </div>
+      <div class="fgroup"><label class="flabel">Mật khẩu hiện tại</label><input type="password" class="finp" id="cp-old" placeholder="••••••"></div>
+      <div class="fgroup"><label class="flabel">Mật khẩu mới</label><input type="password" class="finp" id="cp-new" placeholder="Ít nhất 6 ký tự"></div>
+      <div class="auth-err" id="cp-err"></div>
+      <div class="mact-row">
+        <button class="btn-s" onclick="closeOverlay('ov-auth')">Đóng</button>
+        <button class="btn-s" onclick="changePw()">Đổi mật khẩu</button>
+        <button class="btn-danger" onclick="logout()">Đăng xuất</button>
       </div>`;
     return;
   }
-  document.getElementById('auth-modal-title').textContent='Đăng nhập / Đăng ký';
-  body.innerHTML=`
-    <div class="auth-info">🔒 Đăng nhập để dữ liệu được lưu trên máy chủ và đồng bộ giữa các thiết bị. Nếu không đăng nhập, dữ liệu vẫn được lưu trên trình duyệt này.</div>
+  document.getElementById('auth-modal-title').textContent = 'Đăng nhập / Đăng ký';
+  body.innerHTML = `
+    <div class="auth-info">🔒 Đăng nhập để đồng bộ dữ liệu giữa các thiết bị. Chưa đăng nhập thì dữ liệu vẫn lưu trên trình duyệt này.</div>
     <div class="auth-tabs">
-      <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Đăng nhập</button>
-      <button class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">Đăng ký</button>
+      <button class="auth-tab active" onclick="switchAuthTab('login',this)">Đăng nhập</button>
+      <button class="auth-tab" onclick="switchAuthTab('reg',this)">Đăng ký</button>
     </div>
-    <div id="auth-login-form">
-      <div class="fgroup"><label class="flabel">Email</label><input type="email" class="finp" id="login-email" placeholder="your@email.com" onkeydown="if(event.key==='Enter')doLogin()"></div>
-      <div class="fgroup"><label class="flabel">Mật khẩu</label><input type="password" class="finp" id="login-pw" placeholder="Mật khẩu" onkeydown="if(event.key==='Enter')doLogin()"></div>
-      <div class="auth-err" id="login-err"></div>
+    <div id="auth-login">
+      <div class="fgroup"><label class="flabel">Email</label><input type="email" class="finp" id="li-email" placeholder="your@email.com" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="fgroup"><label class="flabel">Mật khẩu</label><input type="password" class="finp" id="li-pw" placeholder="••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="auth-err" id="li-err"></div>
       <button class="btn-p" style="width:100%;" onclick="doLogin()">Đăng nhập</button>
     </div>
-    <div id="auth-register-form" style="display:none;">
-      <div class="fgroup"><label class="flabel">Email</label><input type="email" class="finp" id="reg-email" placeholder="your@email.com"></div>
-      <div class="fgroup"><label class="flabel">Mật khẩu</label><input type="password" class="finp" id="reg-pw" placeholder="Ít nhất 6 ký tự" onkeydown="if(event.key==='Enter')doRegister()"></div>
-      <div class="auth-err" id="reg-err"></div>
+    <div id="auth-reg" style="display:none;">
+      <div class="fgroup"><label class="flabel">Email</label><input type="email" class="finp" id="rg-email" placeholder="your@email.com"></div>
+      <div class="fgroup"><label class="flabel">Mật khẩu</label><input type="password" class="finp" id="rg-pw" placeholder="Ít nhất 6 ký tự" onkeydown="if(event.key==='Enter')doRegister()"></div>
+      <div class="auth-err" id="rg-err"></div>
       <button class="btn-p" style="width:100%;" onclick="doRegister()">Tạo tài khoản</button>
     </div>`;
 }
 
-function switchAuthTab(tab){
-  document.getElementById('tab-login').classList.toggle('active',tab==='login');
-  document.getElementById('tab-register').classList.toggle('active',tab==='register');
-  document.getElementById('auth-login-form').style.display=tab==='login'?'':'none';
-  document.getElementById('auth-register-form').style.display=tab==='register'?'':'none';
+function switchAuthTab(tab, btn){
+  document.querySelectorAll('.auth-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('auth-login').style.display = tab==='login'?'':'none';
+  document.getElementById('auth-reg').style.display   = tab==='reg'?'':'none';
 }
 
 async function doLogin(){
-  const email=document.getElementById('login-email').value.trim();
-  const pw=document.getElementById('login-pw').value;
-  const errEl=document.getElementById('login-err');
-  errEl.classList.remove('show');
-  if(!email||!pw){errEl.textContent='Vui lòng điền đầy đủ';errEl.classList.add('show');return;}
-  const btn=document.querySelector('#auth-login-form .btn-p');
-  btn.textContent='Đang đăng nhập...';btn.disabled=true;
+  const email=document.getElementById('li-email').value.trim(), pw=document.getElementById('li-pw').value;
+  const err=document.getElementById('li-err'); err.classList.remove('show');
+  if(!email||!pw){err.textContent='Điền đầy đủ thông tin';err.classList.add('show');return;}
   try{
     const d=await apiCall('POST','/api/auth/login',{email,password:pw},false);
-    authToken=d.token;authUser=d.user;
-    localStorage.setItem('auth_token',authToken);
-    localStorage.setItem('auth_user',JSON.stringify(authUser));
-    closeOverlay('ov-auth');
-    setSyncStatus('idle');
-    toast(`✓ Chào mừng ${authUser.email.split('@')[0]}!`,'ok');
-    await pushLocalDataToServer();
-    renderAuthModal();
-  }catch(e){
-    errEl.textContent=e.message;errEl.classList.add('show');
-    btn.textContent='Đăng nhập';btn.disabled=false;
-  }
+    authToken=d.token; authUser=d.user;
+    localStorage.setItem('auth_token',authToken); localStorage.setItem('auth_user',JSON.stringify(authUser));
+    closeOverlay('ov-auth'); setSyncStatus('idle'); toast('✓ Đăng nhập thành công!','ok');
+    await pushLocalToServer(); renderAuthModal();
+  } catch(e){ err.textContent=e.message; err.classList.add('show'); }
 }
 
 async function doRegister(){
-  const email=document.getElementById('reg-email').value.trim();
-  const pw=document.getElementById('reg-pw').value;
-  const errEl=document.getElementById('reg-err');
-  errEl.classList.remove('show');
-  if(!email||!pw){errEl.textContent='Vui lòng điền đầy đủ';errEl.classList.add('show');return;}
-  const btn=document.querySelector('#auth-register-form .btn-p');
-  btn.textContent='Đang tạo tài khoản...';btn.disabled=true;
+  const email=document.getElementById('rg-email').value.trim(), pw=document.getElementById('rg-pw').value;
+  const err=document.getElementById('rg-err'); err.classList.remove('show');
+  if(!email||!pw){err.textContent='Điền đầy đủ thông tin';err.classList.add('show');return;}
   try{
     const d=await apiCall('POST','/api/auth/register',{email,password:pw},false);
-    authToken=d.token;authUser=d.user;
-    localStorage.setItem('auth_token',authToken);
-    localStorage.setItem('auth_user',JSON.stringify(authUser));
-    closeOverlay('ov-auth');
-    setSyncStatus('idle');
-    toast(`✓ Đã tạo tài khoản thành công!`,'ok');
-    await pushLocalDataToServer();
-    renderAuthModal();
-  }catch(e){
-    errEl.textContent=e.message;errEl.classList.add('show');
-    btn.textContent='Tạo tài khoản';btn.disabled=false;
-  }
+    authToken=d.token; authUser=d.user;
+    localStorage.setItem('auth_token',authToken); localStorage.setItem('auth_user',JSON.stringify(authUser));
+    closeOverlay('ov-auth'); setSyncStatus('idle'); toast('✓ Tạo tài khoản thành công!','ok');
+    await pushLocalToServer(); renderAuthModal();
+  } catch(e){ err.textContent=e.message; err.classList.add('show'); }
 }
 
-async function changePassword(){
-  const old=document.getElementById('cp-old').value;
-  const nw=document.getElementById('cp-new').value;
-  const errEl=document.getElementById('cp-err');
-  errEl.classList.remove('show');
-  if(!old||!nw){errEl.textContent='Vui lòng điền đầy đủ';errEl.classList.add('show');return;}
-  try{
-    await apiCall('POST','/api/auth/change-password',{currentPassword:old,newPassword:nw});
-    document.getElementById('cp-old').value='';document.getElementById('cp-new').value='';
-    toast('✓ Đổi mật khẩu thành công','ok');
-  }catch(e){errEl.textContent=e.message;errEl.classList.add('show');}
+async function changePw(){
+  const o=document.getElementById('cp-old').value, n=document.getElementById('cp-new').value;
+  const err=document.getElementById('cp-err'); err.classList.remove('show');
+  try{ await apiCall('POST','/api/auth/change-password',{currentPassword:o,newPassword:n}); toast('✓ Đổi mật khẩu thành công','ok'); }
+  catch(e){ err.textContent=e.message; err.classList.add('show'); }
 }
 
 function logout(){
-  authToken=null;authUser=null;
-  localStorage.removeItem('auth_token');localStorage.removeItem('auth_user');
-  setSyncStatus('idle');
-  closeOverlay('ov-auth');
-  toast('Đã đăng xuất','ok');
-  renderAuthModal();
+  authToken=null; authUser=null;
+  localStorage.removeItem('auth_token'); localStorage.removeItem('auth_user');
+  setSyncStatus('idle'); closeOverlay('ov-auth'); toast('Đã đăng xuất','ok'); renderAuthModal();
 }
 
-// ── Verify token on load ──
-async function verifyToken(){
-  if(!authToken)return;
-  try{
-    const d=await apiCall('GET','/api/auth/me');
-    authUser=d.user;localStorage.setItem('auth_user',JSON.stringify(authUser));
-    setSyncStatus('ok');
-    await loadServerData();
-  }catch(e){
-    // Token expired or invalid
-    authToken=null;authUser=null;
-    localStorage.removeItem('auth_token');localStorage.removeItem('auth_user');
-    setSyncStatus('idle');
+// ══════════════════════════════════════════════════════════
+// CUSTOM TAGS MANAGEMENT
+// ══════════════════════════════════════════════════════════
+function openTags(){ renderTagsModal(); openOverlay('ov-tags'); }
+
+function renderTagsModal(){
+  const grid = document.getElementById('tags-grid');
+  if (!grid) return;
+  const counts = {};
+  customEvents.forEach(e=>{ counts[e.tag]=(counts[e.tag]||0)+1; });
+  grid.innerHTML = customTags.map(t=>`
+    <div class="tag-card">
+      <div class="tag-card-top">
+        <span class="tag-icon-big">${t.icon||'🏷️'}</span>
+        <div>
+          <div class="tag-card-name">${t.name}</div>
+          <div class="tag-card-count">${counts[t.id]||0} sự kiện</div>
+        </div>
+        <div class="tag-card-swatch" style="background:${t.color||'#9b72cf'}"></div>
+      </div>
+      <div id="share-reveal-${t.id}" style="display:none;"></div>
+      <div class="tag-card-acts">
+        <button class="tag-card-act share" onclick="shareTag('${t.id}')">🔗 Chia sẻ</button>
+        <button class="tag-card-act del" onclick="deleteTag('${t.id}')">🗑️</button>
+      </div>
+    </div>`).join('');
+}
+
+function pickColor(el){
+  document.querySelectorAll('.color-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  selectedColor = el.getAttribute('data-color');
+}
+
+async function createTag(){
+  const name = document.getElementById('new-tag-name').value.trim();
+  const icon = document.getElementById('new-tag-icon').value.trim() || '🏷️';
+  if (!name){ toast('Nhập tên tag','err'); return; }
+  const id = 'tag_' + Date.now();
+  customTags.push({id, name, color: selectedColor, icon});
+  await syncTags();
+  document.getElementById('new-tag-name').value='';
+  document.getElementById('new-tag-icon').value='';
+  renderTagsModal(); renderTagBar(); toast('✓ Đã tạo tag: ' + name,'ok');
+}
+
+async function deleteTag(id){
+  if (['personal','work','family'].includes(id)){ toast('Không thể xoá tag mặc định','err'); return; }
+  askConfirm(`Xoá tag này? Các sự kiện dùng tag này sẽ chuyển về tag "Cá nhân".`, async ()=>{
+    customEvents = customEvents.map(e=> e.tag===id ? {...e, tag:'personal'} : e);
+    customTags = customTags.filter(t=>t.id!==id);
+    await syncCustom(); await syncTags();
+    renderTagsModal(); renderTagBar(); refreshAll(); toast('Đã xoá tag','ok');
+  });
+}
+
+async function shareTag(tagId){
+  const tag = customTags.find(t=>t.id===tagId);
+  if (!tag){ toast('Không tìm thấy tag','err'); return; }
+  const events = customEvents.filter(e=>e.tag===tagId).map(e=>({...e, date:e.date.toISOString()}));
+
+  if (!isLoggedIn()){
+    // Generate a local share code and store in localStorage for offline sharing
+    toast('Đăng nhập để chia sẻ tag qua server 🔒','err'); return;
   }
+
+  try {
+    const r = await apiCall('POST','/api/share/tag',{tagId:tag.id, tagName:tag.name, tagColor:tag.color, tagIcon:tag.icon, events});
+    const box = document.getElementById('share-reveal-'+tagId);
+    if (box){
+      box.style.display='block';
+      box.innerHTML=`<div class="share-code-box"><span class="share-code">${r.shareCode}</span><button class="copy-btn" onclick="copyCode('${r.shareCode}')">Copy</button></div><div style="font-size:10px;color:var(--muted);margin-top:6px;">${r.eventCount} sự kiện · Người khác dùng mã này để nhập tag</div>`;
+    }
+    toast('✓ Mã chia sẻ: ' + r.shareCode,'ok');
+  } catch(e){ toast('Lỗi: '+e.message,'err'); }
+}
+
+function copyCode(code){
+  navigator.clipboard.writeText(code).then(()=>toast('✓ Đã copy mã: '+code,'ok')).catch(()=>toast('Không copy được','err'));
+}
+
+async function importSharedTag(){
+  const code = document.getElementById('import-code').value.trim().toUpperCase();
+  if (!code || code.length < 4){ toast('Nhập mã chia sẻ hợp lệ','err'); return; }
+  try {
+    const r = await apiCall('GET','/api/share/tag/'+code, null, false);
+    // Import tag if not exists
+    const existTag = customTags.find(t=>t.id===r.tagId||t.name===r.tagName);
+    let targetTagId = r.tagId;
+    if (!existTag){
+      customTags.push({id:r.tagId, name:r.tagName, color:r.tagColor||'#9b72cf', icon:r.tagIcon||'🏷️'});
+      await syncTags();
+    } else {
+      targetTagId = existTag.id;
+    }
+    // Import events
+    let added = 0;
+    r.events.forEach(ev=>{
+      if (!customEvents.find(e=>e.id===ev.id)){
+        customEvents.push({...ev, tag:targetTagId, date:new Date(ev.date)});
+        added++;
+      }
+    });
+    await syncCustom();
+    document.getElementById('import-code').value='';
+    renderTagsModal(); renderTagBar(); refreshAll();
+    toast(`✓ Nhập thành công: ${r.tagName} (${added} sự kiện mới)`,'ok');
+  } catch(e){ toast('Lỗi: '+e.message,'err'); }
 }
 
 // ══════════════════════════════════════════════════════════
 // WEATHER
 // ══════════════════════════════════════════════════════════
-function wxIcon(c){if(c===113)return'☀️';if(c===116)return'⛅';if(c===119||c===122)return'☁️';if(c>=143&&c<=185)return'🌫️';if(c>=200&&c<=260)return'❄️';if(c>=263&&c<=296)return'🌧️';if(c>=299&&c<=395)return'⛈️';return'🌤️';}
+function wxIcon(c){if(c===113)return'☀️';if(c===116)return'⛅';if([119,122].includes(c))return'☁️';if(c>=143&&c<=185)return'🌫️';if(c>=200&&c<=260)return'❄️';if(c>=263&&c<=296)return'🌧️';if(c>=299&&c<=395)return'⛈️';return'🌤️';}
 
 async function fetchWx(loc){
-  const k=loc.toLowerCase().trim();const c=wxCache[k];if(c&&Date.now()-c.ts<15*60*1000)return c.d;
+  const k=loc.toLowerCase().trim(); const c=wxCache[k];
+  if(c&&Date.now()-c.ts<15*60*1000) return c.d;
   try{
-    const r=await fetch(`https://wttr.in/${encodeURIComponent(loc)}?format=j1`);if(!r.ok)return null;
-    const j=await r.json();const cc=j.current_condition[0];
+    const r=await fetch(`https://wttr.in/${encodeURIComponent(loc)}?format=j1`);
+    if(!r.ok) return null;
+    const j=await r.json(); const cc=j.current_condition[0];
     const d={temp:parseInt(cc.temp_C),feels:parseInt(cc.FeelsLikeC),hum:parseInt(cc.humidity),wind:parseInt(cc.windspeedKmph),desc:cc.weatherDesc[0].value,icon:wxIcon(parseInt(cc.weatherCode)),city:j.nearest_area[0].areaName[0].value+', '+j.nearest_area[0].country[0].value};
-    wxCache[k]={d,ts:Date.now()};return d;
-  }catch{return null;}
+    wxCache[k]={d,ts:Date.now()}; return d;
+  } catch{ return null; }
 }
 
 async function loadMainWx(){
-  const d=await fetchWx(mainLoc);if(!d)return;
-  document.getElementById('wxb-icon').textContent=d.icon;document.getElementById('wxb-temp').textContent=`${d.temp}°C`;document.getElementById('wxb-desc').textContent=d.desc;document.getElementById('wxb-city').textContent=d.city;document.getElementById('wxb-hum').textContent=`💧 ${d.hum}%`;document.getElementById('wxb-wind').textContent=`💨 ${d.wind}km/h`;document.getElementById('wxb-feels').textContent=`🌡️ Cảm giác ${d.feels}°C`;
-  const n=new Date();document.getElementById('wxb-upd').textContent=`Cập nhật ${n.getHours()}:${pz(n.getMinutes())}`;document.getElementById('wxb-hint').textContent=`📍 ${d.city}`;
-  const fw=document.getElementById('feat-wx');fw.innerHTML=`<span class="feat-wx-icon">${d.icon}</span><div class="feat-wx-temp">${d.temp}°C</div><div class="feat-wx-city">${d.city.split(',')[0]}</div>`;
+  const d=await fetchWx(mainLoc); if(!d) return;
+  document.getElementById('wxb-icon').textContent=d.icon;
+  document.getElementById('wxb-temp').textContent=`${d.temp}°C`;
+  document.getElementById('wxb-desc').textContent=d.desc;
+  document.getElementById('wxb-city').textContent=d.city;
+  document.getElementById('wxb-hum').textContent=`💧 ${d.hum}%`;
+  document.getElementById('wxb-wind').textContent=`💨 ${d.wind}km/h`;
+  document.getElementById('wxb-feels').textContent=`🌡️ Cảm giác ${d.feels}°C`;
+  const n=new Date(); document.getElementById('wxb-upd').textContent=`Cập nhật ${n.getHours()}:${pz(n.getMinutes())}`;
+  document.getElementById('wxb-hint').textContent=`📍 ${d.city}`;
+  const fw=document.getElementById('feat-wx');
+  if(fw) fw.innerHTML=`<span class="feat-wx-icon">${d.icon}</span><div class="feat-wx-temp">${d.temp}°C</div><div class="feat-wx-city">${d.city.split(',')[0]}</div>`;
 }
 
 async function changeMainWx(){
-  const loc=document.getElementById('wxb-loc').value.trim();if(!loc){toast('Nhập địa điểm','err');return;}
+  const loc=document.getElementById('wxb-loc').value.trim();
+  if(!loc){toast('Nhập địa điểm','err');return;}
   document.getElementById('wxb-hint').textContent='⏳ Đang tải...';
-  const d=await fetchWx(loc);if(!d){toast('Không tìm thấy địa điểm','err');document.getElementById('wxb-hint').textContent='';return;}
-  mainLoc=loc;await saveWxLoc(loc);document.getElementById('wxb-loc').value='';
-  loadMainWx();toast(`✓ Chuyển sang ${d.city}`,'ok');
+  const d=await fetchWx(loc);
+  if(!d){toast('Không tìm thấy địa điểm','err');document.getElementById('wxb-hint').textContent='';return;}
+  mainLoc=loc; await syncWxLoc(loc);
+  document.getElementById('wxb-loc').value='';
+  loadMainWx(); toast(`✓ Chuyển sang ${d.city}`,'ok');
 }
 
 async function prevLocWx(){
-  const loc=document.getElementById('f-loc').value.trim();if(!loc){toast('Nhập địa điểm trước','err');return;}
-  const prev=document.getElementById('loc-prev');prev.style.display='flex';
-  document.getElementById('lp-icon').textContent='⏳';document.getElementById('lp-temp').textContent='Đang tải...';document.getElementById('lp-city').textContent='';
+  const loc=document.getElementById('f-loc').value.trim();
+  if(!loc){toast('Nhập địa điểm trước','err');return;}
+  const prev=document.getElementById('loc-prev'); prev.style.display='flex';
+  document.getElementById('lp-icon').textContent='⏳';
+  document.getElementById('lp-temp').textContent='Đang tải...';
+  document.getElementById('lp-city').textContent='';
   const d=await fetchWx(loc);
   if(!d){document.getElementById('lp-icon').textContent='❌';document.getElementById('lp-temp').textContent='Không tìm thấy';return;}
-  document.getElementById('lp-icon').textContent=d.icon;document.getElementById('lp-temp').textContent=`${d.temp}°C · ${d.desc}`;document.getElementById('lp-city').textContent=d.city;
+  document.getElementById('lp-icon').textContent=d.icon;
+  document.getElementById('lp-temp').textContent=`${d.temp}°C · ${d.desc}`;
+  document.getElementById('lp-city').textContent=d.city;
+}
+
+// ══════════════════════════════════════════════════════════
+// REBUILD
+// ══════════════════════════════════════════════════════════
+function rebuild(){
+  const yr=new Date().getFullYear();
+  const sys=getSysForRange(yr, yr+1);
+  allEvents=[...sys,...customEvents].filter(e=>e.date&&!isNaN(e.date)).sort((a,b)=>a.date-b.date);
+  renderTagBar();
+}
+
+function renderTagBar(){
+  const bar=document.getElementById('tag-bar');
+  if(!bar) return;
+  // System tags
+  const sysTags=[
+    {id:'solar',  name:'Dương lịch', color:'#f4a522', icon:'☀️'},
+    {id:'lunar',  name:'Âm lịch',    color:'#f4a522', icon:'🌙'},
+    {id:'holiday',name:'Nghỉ lễ',    color:'#2ec4b6', icon:'🏖️'},
+  ];
+  const allTags=[...sysTags, ...customTags];
+  // Remove existing tag buttons (keep first btn-all, keep new-ev and manage-tags buttons)
+  const allTagBtns = bar.querySelectorAll('.tb:not(.tb-all)');
+  allTagBtns.forEach(b=>b.remove());
+  // Insert after .tb-all
+  const allBtn = bar.querySelector('.tb-all');
+  allTags.forEach(t=>{
+    const btn=document.createElement('button');
+    const isAct = curFilter===t.id;
+    btn.className='tb'+(isAct?' act':'');
+    btn.setAttribute('data-tag',t.id);
+    btn.innerHTML=`${t.icon||''} ${t.name}`;
+    btn.style.cssText=`background:${hexAlpha(t.color,.1)};color:${t.color};border-color:${hexAlpha(t.color,.35)};`;
+    if(isAct) btn.style.cssText+=`background:${hexAlpha(t.color,.25)};transform:scale(1.04);`;
+    btn.onclick=()=>fTag(t.id);
+    allBtn.after(btn);
+  });
+}
+
+function hexAlpha(hex,a){
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+function getTagInfo(tagId){
+  const sysTags={solar:{color:'#f4a522',icon:'☀️',name:'Dương lịch'},lunar:{color:'#f4a522',icon:'🌙',name:'Âm lịch'},holiday:{color:'#2ec4b6',icon:'🏖️',name:'Nghỉ lễ'}};
+  if(sysTags[tagId]) return sysTags[tagId];
+  const t=customTags.find(t=>t.id===tagId);
+  return t||{color:'#9b72cf',icon:'⭐',name:tagId};
+}
+
+// ══════════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════════
+function pz(n){ return String(n).padStart(2,'0'); }
+
+function getDiff(date){
+  const df=date-new Date(); if(df<0) return null;
+  return{d:Math.floor(df/864e5),h:Math.floor(df%864e5/36e5),m:Math.floor(df%36e5/6e4),s:Math.floor(df%6e4/1e3)};
+}
+
+function isToday(date){
+  const n=new Date();
+  return date.getFullYear()===n.getFullYear()&&date.getMonth()===n.getMonth()&&date.getDate()===n.getDate();
+}
+
+function isTodayOrPast(date){
+  const n=new Date(); n.setHours(0,0,0,0);
+  const d=new Date(date); d.setHours(0,0,0,0);
+  return d<=n;
+}
+
+// ══════════════════════════════════════════════════════════
+// TODAY EVENTS BANNER
+// ══════════════════════════════════════════════════════════
+function renderTodayBanner(){
+  const todayEvs = allEvents.filter(e=>{
+    if(curFilter!=='all'&&e.tag!==curFilter) return false;
+    return isToday(e.date);
+  });
+  const banner = document.getElementById('today-banner');
+  if(!todayEvs.length){ banner.style.display='none'; return; }
+  banner.style.display='block';
+  document.getElementById('today-wish').textContent = getRandomWish();
+  const items=document.getElementById('today-items');
+  items.innerHTML=todayEvs.map(ev=>`
+    <div class="today-item" onclick="showDetail(allEvents.find(e=>e.id==='${ev.id||''}'))">
+      <span class="today-item-icon">${ev.icon||'📅'}</span>
+      <div>
+        <div class="today-item-name">${ev.name}</div>
+        <div class="today-item-tag">${getTagInfo(ev.tag).name}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════════════════════
+// DAILY QUOTE
+// ══════════════════════════════════════════════════════════
+function renderQuote(){
+  const q = getDailyQuote();
+  if(!q) return;
+  const parts = q.split('—');
+  document.getElementById('quote-text').textContent = parts[0].trim();
+  document.getElementById('quote-author').textContent = parts.length>1 ? '— ' + parts.slice(1).join('—').trim() : '';
+}
+
+// ══════════════════════════════════════════════════════════
+// COUNTDOWN RENDER
+// ══════════════════════════════════════════════════════════
+function renderCountdown(){
+  const now=new Date();
+  const filtered=allEvents.filter(e=>curFilter==='all'||e.tag===curFilter);
+  const todayEvs=filtered.filter(e=>isToday(e.date));
+  const upcoming=filtered.filter(e=>e.date>now&&!isToday(e.date)).sort((a,b)=>a.date-b.date);
+  const past=filtered.filter(e=>e.date<now&&!isToday(e.date)).sort((a,b)=>b.date-a.date);
+
+  // Featured: first upcoming (not today)
+  if(upcoming.length){
+    const f=upcoming[0]; const c=getDiff(f.date);
+    document.getElementById('feat-name').textContent=(f.icon?f.icon+' ':'')+f.name;
+    document.getElementById('feat-sub').textContent=f.date.toLocaleDateString('vi-VN',{weekday:'long',year:'numeric',month:'long',day:'numeric'})+(f.note?' · '+f.note:'');
+    if(c)['d','h','m','s'].forEach(k=>document.getElementById('cd-'+k).textContent=pz(c[k]));
+  }
+
+  renderTodayBanner();
+
+  const grid=document.getElementById('evgrid'); grid.innerHTML='';
+
+  // Render order: upcoming, then past (today already shown in banner but also show in grid)
+  const orderedEvs=[...todayEvs,...upcoming,...past];
+  orderedEvs.forEach((ev,i)=>{
+    const c=getDiff(ev.date);
+    const isPast=!c&&!isToday(ev.date);
+    const isCustom=!!ev.id;
+    const ti=getTagInfo(ev.tag);
+    const card=document.createElement('div');
+    card.className='ecard'+(isPast?' passed':'')+(isToday(ev.date)?' today-ev':'');
+    card.style.borderLeft=`3px solid ${ti.color}`;
+    card.onclick=()=>showDetail(ev);
+
+    const acts=isCustom?`<div class="card-acts"><button class="cact edit" onclick="event.stopPropagation();openEditForm('${ev.id}')">✏️</button><button class="cact del" onclick="event.stopPropagation();askDel('${ev.id}')">🗑️</button></div>`:'';
+    const locH=ev.location?`<div class="eloc">📍 ${ev.location}</div>`:'';
+    const wxH=ev.location?`<div class="ewx-row" id="ewx-${ev.id||'s'+i}"><span class="ewx-icon" style="animation:shimmer 2s infinite">⏳</span><span style="font-size:10px;color:var(--muted)">Đang tải...</span></div>`:'';
+
+    let cdH='';
+    if(isToday(ev.date)){
+      cdH=`<div style="background:rgba(244,165,34,.15);border:1px solid rgba(244,165,34,.4);border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;color:var(--gold);">🎉 Hôm nay!</div>`;
+    } else if(isPast){
+      cdH=`<div class="epast">✓ Đã qua · ${ev.date.toLocaleDateString('vi-VN')}</div>`;
+    } else if(c){
+      cdH=`<div class="emini"><div class="mn"><span class="mn-num" style="color:${ti.color}">${pz(c.d)}</span><span class="mn-lbl">ngày</span></div><span class="mn-sep">·</span><div class="mn"><span class="mn-num" style="color:${ti.color}">${pz(c.h)}</span><span class="mn-lbl">giờ</span></div><span class="mn-sep">·</span><div class="mn"><span class="mn-num" style="color:${ti.color}">${pz(c.m)}</span><span class="mn-lbl">phút</span></div></div>`;
+    }
+
+    card.innerHTML=`${acts}
+      <span class="etag" style="background:${hexAlpha(ti.color,.12)};color:${ti.color};">${ti.icon||''} ${ti.name}</span>
+      <div class="ename">${ev.icon||''} ${ev.name}</div>
+      <div class="edate">${ev.date.toLocaleDateString('vi-VN',{weekday:'short',day:'numeric',month:'numeric',year:'numeric'})
+        + (ev.hasTime?` · ${pz(ev.date.getHours())}:${pz(ev.date.getMinutes())}:${pz(ev.date.getSeconds())}`:'')
+        + (ev.note?' · '+ev.note:'')}</div>
+      ${locH}${cdH}${wxH}`;
+    grid.appendChild(card);
+    if(ev.location){
+      const wid=ev.id||'s'+i;
+      fetchWx(ev.location).then(d=>{
+        const el=document.getElementById('ewx-'+wid); if(!el) return;
+        if(!d){el.innerHTML='<span class="ewx-icon">❓</span><span style="font-size:10px;color:var(--muted)">Không lấy được</span>';return;}
+        el.innerHTML=`<span class="ewx-icon">${d.icon}</span><span class="ewx-temp">${d.temp}°C</span><span style="font-size:10px;color:var(--muted)">${d.desc}</span>`;
+      });
+    }
+  });
+}
+
+function updateFeatCd(){
+  const now=new Date();
+  const up=allEvents.filter(e=>e.date>now&&!isToday(e.date)&&(curFilter==='all'||e.tag===curFilter)).sort((a,b)=>a.date-b.date);
+  if(!up.length) return;
+  const c=getDiff(up[0].date); if(c)['d','h','m','s'].forEach(k=>{ const el=document.getElementById('cd-'+k); if(el) el.textContent=pz(c[k]); });
+}
+
+function fTag(tag){
+  curFilter=tag;
+  document.querySelectorAll('.tb').forEach(b=>b.classList.remove('act'));
+  const btn=document.querySelector(`.tb[data-tag="${tag}"]`);
+  if(btn){ btn.classList.add('act'); const ti=getTagInfo(tag); if(tag!=='all') btn.style.background=hexAlpha(ti.color,.25); }
+  else { document.querySelector('.tb-all').classList.add('act'); }
+  renderCountdown();
 }
 
 // ══════════════════════════════════════════════════════════
 // FORM (ADD/EDIT)
 // ══════════════════════════════════════════════════════════
+function populateTagSelect(selectedTag){
+  const sel=document.getElementById('f-tag'); if(!sel) return;
+  const allT=[
+    {id:'solar',name:'☀️ Dương lịch'},
+    {id:'lunar',name:'🌙 Âm lịch'},
+    {id:'holiday',name:'🏖️ Nghỉ lễ'},
+    ...customTags.map(t=>({id:t.id,name:`${t.icon||''} ${t.name}`}))
+  ];
+  sel.innerHTML=allT.map(t=>`<option value="${t.id}" ${t.id===(selectedTag||'personal')?'selected':''}>${t.name}</option>`).join('');
+}
+
+function toggleAdvTime(){
+  const chk=document.getElementById('adv-time-chk');
+  const panel=document.getElementById('adv-time-panel');
+  panel.classList.toggle('show', chk.checked);
+}
+
 function openForm(ds){
   editingId=null;
   document.getElementById('form-title').textContent='Thêm sự kiện cá nhân';
   document.getElementById('form-save').textContent='Thêm sự kiện';
-  document.getElementById('f-id').value='';document.getElementById('f-name').value='';
-  document.getElementById('f-date').value=ds||tStr();document.getElementById('f-icon').value='⭐';
-  document.getElementById('f-loc').value='';document.getElementById('f-note').value='';
+  document.getElementById('f-id').value='';
+  document.getElementById('f-name').value='';
+  document.getElementById('f-date').value=ds||tStr();
+  document.getElementById('f-icon').value='⭐';
+  document.getElementById('f-loc').value='';
+  document.getElementById('f-note').value='';
   document.getElementById('loc-prev').style.display='none';
-  openOverlay('ov-form');setTimeout(()=>document.getElementById('f-name').focus(),200);
+  document.getElementById('adv-time-chk').checked=false;
+  document.getElementById('adv-time-panel').classList.remove('show');
+  document.getElementById('f-hour').value=0;
+  document.getElementById('f-min').value=0;
+  document.getElementById('f-sec').value=0;
+  populateTagSelect('personal');
+  openOverlay('ov-form');
+  setTimeout(()=>document.getElementById('f-name').focus(),200);
 }
 
 function openEditForm(id){
-  const ev=customEvents.find(e=>e.id===id);if(!ev)return;
+  const ev=customEvents.find(e=>e.id===id); if(!ev) return;
   editingId=id;
-  document.getElementById('form-title').textContent='Sửa sự kiện';document.getElementById('form-save').textContent='Lưu thay đổi';
-  document.getElementById('f-id').value=id;document.getElementById('f-name').value=ev.name;
-  const d=ev.date;document.getElementById('f-date').value=`${d.getFullYear()}-${pz(d.getMonth()+1)}-${pz(d.getDate())}`;
-  document.getElementById('f-icon').value=ev.icon||'⭐';document.getElementById('f-loc').value=ev.location||'';document.getElementById('f-note').value=ev.note||'';
+  document.getElementById('form-title').textContent='Sửa sự kiện';
+  document.getElementById('form-save').textContent='Lưu thay đổi';
+  document.getElementById('f-id').value=id;
+  document.getElementById('f-name').value=ev.name;
+  const d=ev.date;
+  document.getElementById('f-date').value=`${d.getFullYear()}-${pz(d.getMonth()+1)}-${pz(d.getDate())}`;
+  document.getElementById('f-icon').value=ev.icon||'⭐';
+  document.getElementById('f-loc').value=ev.location||'';
+  document.getElementById('f-note').value=ev.note||'';
+  populateTagSelect(ev.tag);
+  // Restore advanced time if hasTime
+  if(ev.hasTime){
+    document.getElementById('adv-time-chk').checked=true;
+    document.getElementById('adv-time-panel').classList.add('show');
+    document.getElementById('f-hour').value=d.getHours();
+    document.getElementById('f-min').value=d.getMinutes();
+    document.getElementById('f-sec').value=d.getSeconds();
+  } else {
+    document.getElementById('adv-time-chk').checked=false;
+    document.getElementById('adv-time-panel').classList.remove('show');
+    document.getElementById('f-hour').value=0; document.getElementById('f-min').value=0; document.getElementById('f-sec').value=0;
+  }
   document.getElementById('loc-prev').style.display='none';
-  openOverlay('ov-form');if(ev.location)prevLocWx();
+  openOverlay('ov-form');
+  if(ev.location) prevLocWx();
 }
 
 async function saveEvent(){
@@ -988,170 +1433,178 @@ async function saveEvent(){
   const icon=document.getElementById('f-icon').value.trim()||'⭐';
   const loc=document.getElementById('f-loc').value.trim();
   const note=document.getElementById('f-note').value.trim();
+  const tag=document.getElementById('f-tag').value||'personal';
+  const hasTime=document.getElementById('adv-time-chk').checked;
   if(!name){toast('Vui lòng nhập tên sự kiện','err');return;}
   if(!dateVal){toast('Vui lòng chọn ngày','err');return;}
-  const date=new Date(dateVal+'T00:00:00');
+
+  let date;
+  if(hasTime){
+    const h=parseInt(document.getElementById('f-hour').value)||0;
+    const m=parseInt(document.getElementById('f-min').value)||0;
+    const s=parseInt(document.getElementById('f-sec').value)||0;
+    date=new Date(dateVal+'T'+pz(h)+':'+pz(m)+':'+pz(s));
+  } else {
+    date=new Date(dateVal+'T00:00:00');
+  }
+
   if(editingId){
     const i=customEvents.findIndex(e=>e.id===editingId);
-    if(i!==-1)customEvents[i]={...customEvents[i],name,icon,location:loc,note,date};
+    if(i!==-1) customEvents[i]={...customEvents[i],name,icon,location:loc,note,date,tag,hasTime};
     toast('✓ Đã cập nhật','ok');
-  }else{
-    customEvents.push({id:'ev_'+Date.now(),name,tag:'personal',icon,location:loc,note,date});
+  } else {
+    customEvents.push({id:'ev_'+Date.now(),name,tag,icon,location:loc,note,date,hasTime});
     toast('✓ Đã thêm sự kiện','ok');
   }
-  await saveCustom();closeOverlay('ov-form');refreshAll();
+  await syncCustom(); closeOverlay('ov-form'); refreshAll();
 }
 
 // ══════════════════════════════════════════════════════════
 // DETAIL MODAL
 // ══════════════════════════════════════════════════════════
 async function showDetail(ev){
-  if(!ev)return;
-  const isCustom=!!ev.id;const cd=getDiff(ev.date);const isPast=!cd;const tagCls=ev.tag;
+  if(!ev) return;
+  if(_detailTimer){ clearInterval(_detailTimer); _detailTimer=null; }
+  const isCustom=!!ev.id;
+  const ti=getTagInfo(ev.tag);
+  const c=getDiff(ev.date); const isPast=!c;
   const[ld,lm,ly]=LC.s2l(ev.date.getDate(),ev.date.getMonth()+1,ev.date.getFullYear());
-  const lunarStr=`${ld}/${lm}/${ly} Âm lịch`;
-  let cdHtml=isPast?`<div style="font-size:13px;color:var(--muted);font-style:italic;">✓ Sự kiện này đã qua</div>`
-    :`<div class="dh-cd"><div class="dh-unit"><span class="dh-num">${pz(cd.d)}</span><span class="dh-lbl">Ngày</span></div><div class="dh-unit"><span class="dh-num">${pz(cd.h)}</span><span class="dh-lbl">Giờ</span></div><div class="dh-unit"><span class="dh-num">${pz(cd.m)}</span><span class="dh-lbl">Phút</span></div><div class="dh-unit"><span class="dh-num">${pz(cd.s)}</span><span class="dh-lbl">Giây</span></div></div>`;
-  const actHtml=isCustom?`<div class="dact-row"><button class="btn-s" onclick="closeOverlay('ov-detail');openEditForm('${ev.id}')">✏️ Sửa sự kiện</button><button class="btn-danger" onclick="closeOverlay('ov-detail');askDel('${ev.id}')">🗑️ Xoá</button></div>`:'';
-  const wxHtml=ev.location?`<div class="detail-section"><div class="detail-section-title">Thời tiết tại địa điểm</div><div class="detail-wx-box" id="detail-wx-box"><span style="font-size:14px;color:var(--muted);animation:pulse 1.5s infinite">⏳ Đang tải thời tiết...</span></div></div>`:'';
-  const noteHtml=ev.note?`<div class="detail-section"><div class="detail-section-title">Ghi chú</div><div class="detail-note">${ev.note}</div></div>`:'';
+
+  let cdHtml=isPast
+    ?`<div style="font-size:12px;color:var(--muted);font-style:italic;">✓ Sự kiện này đã qua</div>`
+    :`<div class="dh-cd"><div class="dh-unit"><span class="dh-num" id="dt-d">${pz(c.d)}</span><span class="dh-lbl">Ngày</span></div><div class="dh-unit"><span class="dh-num" id="dt-h">${pz(c.h)}</span><span class="dh-lbl">Giờ</span></div><div class="dh-unit"><span class="dh-num" id="dt-m">${pz(c.m)}</span><span class="dh-lbl">Phút</span></div><div class="dh-unit"><span class="dh-num" id="dt-s">${pz(c.s)}</span><span class="dh-lbl">Giây</span></div></div>`;
+
+  const actHtml=isCustom
+    ?`<div class="dact-row"><button class="btn-s" onclick="closeOverlay('ov-detail');openEditForm('${ev.id}')">✏️ Sửa</button><button class="btn-danger" onclick="closeOverlay('ov-detail');askDel('${ev.id}')">🗑️ Xoá</button></div>`
+    :'';
+
+  const timeStr=ev.hasTime?`${pz(ev.date.getHours())}:${pz(ev.date.getMinutes())}:${pz(ev.date.getSeconds())}`:null;
+
   document.getElementById('detail-body').innerHTML=`
-    <div class="detail-hero ${tagCls}">
+    <div class="detail-hero" style="border-left:4px solid ${ti.color};">
       <span class="dh-icon">${ev.icon||'📅'}</span>
       <div class="dh-name">${ev.name}</div>
-      <div class="dh-date">${ev.date.toLocaleDateString('vi-VN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>
+      <div class="dh-date">${ev.date.toLocaleDateString('vi-VN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}${timeStr?' · ⏰ '+timeStr:''}</div>
       ${cdHtml}
     </div>
     <div class="detail-section">
       <div class="detail-section-title">Thông tin</div>
-      <div class="detail-row"><span class="detail-row-icon">📅</span><div class="detail-row-val">${ev.date.toLocaleDateString('vi-VN',{day:'numeric',month:'long',year:'numeric'})}<span>${ev.date.toLocaleDateString('vi-VN',{weekday:'long'})}</span></div></div>
-      <div class="detail-row"><span class="detail-row-icon">🌙</span><div class="detail-row-val">${lunarStr}</div></div>
-      <div class="detail-row"><span class="detail-row-icon">${ev.tag==='solar'?'☀️':ev.tag==='lunar'?'🌙':ev.tag==='holiday'?'🏖️':'⭐'}</span><div class="detail-row-val">${tagLabel(ev.tag)}</div></div>
+      <div class="detail-row"><span class="detail-row-icon">🏷️</span><div class="detail-row-val">${ti.icon} ${ti.name}</div></div>
+      <div class="detail-row"><span class="detail-row-icon">🌙</span><div class="detail-row-val">${ld}/${lm}/${ly} Âm lịch</div></div>
       ${ev.location?`<div class="detail-row"><span class="detail-row-icon">📍</span><div class="detail-row-val">${ev.location}</div></div>`:''}
+      ${timeStr?`<div class="detail-row"><span class="detail-row-icon">⏱️</span><div class="detail-row-val">Giờ cụ thể: ${timeStr}</div></div>`:''}
     </div>
-    ${wxHtml}${noteHtml}${actHtml}`;
+    ${ev.location?`<div class="detail-section"><div class="detail-section-title">Thời tiết tại địa điểm</div><div class="detail-wx-box" id="detail-wx-box"><span style="font-size:12px;color:var(--muted);animation:shimmer 2s infinite">⏳ Đang tải...</span></div></div>`:''}
+    ${ev.note?`<div class="detail-section"><div class="detail-section-title">Ghi chú</div><div class="detail-note">${ev.note}</div></div>`:''}
+    ${actHtml}`;
+
   openOverlay('ov-detail');
+
   if(!isPast){
-    const timer=setInterval(()=>{
-      const el=document.getElementById('ov-detail');if(!el||!el.classList.contains('open')){clearInterval(timer);return;}
-      const c=getDiff(ev.date);if(!c){clearInterval(timer);return;}
-      const units=document.querySelectorAll('#detail-body .dh-num');
-      if(units[0])units[0].textContent=pz(c.d);if(units[1])units[1].textContent=pz(c.h);if(units[2])units[2].textContent=pz(c.m);if(units[3])units[3].textContent=pz(c.s);
+    _detailTimer=setInterval(()=>{
+      if(!document.getElementById('ov-detail').classList.contains('open')){clearInterval(_detailTimer);_detailTimer=null;return;}
+      const c2=getDiff(ev.date); if(!c2){clearInterval(_detailTimer);return;}
+      ['d','h','m','s'].forEach(k=>{const el=document.getElementById('dt-'+k);if(el)el.textContent=pz(c2[k]);});
     },1000);
   }
+
   if(ev.location){
-    const d=await fetchWx(ev.location);const wb=document.getElementById('detail-wx-box');
-    if(wb){if(!d){wb.innerHTML='<span style="font-size:13px;color:var(--muted);">Không lấy được thời tiết</span>';return;}
-      wb.innerHTML=`<span class="dwx-icon">${d.icon}</span><div><div class="dwx-temp">${d.temp}°C</div><div class="dwx-info">${d.desc} · Độ ẩm ${d.hum}% · Gió ${d.wind}km/h<br>📍 ${d.city}</div></div>`;}
+    const d=await fetchWx(ev.location);
+    const wb=document.getElementById('detail-wx-box');
+    if(wb){
+      if(!d){wb.innerHTML='<span style="font-size:12px;color:var(--muted);">Không lấy được thời tiết</span>';return;}
+      wb.innerHTML=`<span class="dwx-icon">${d.icon}</span><div><div class="dwx-temp">${d.temp}°C</div><div class="dwx-info">${d.desc} · 💧${d.hum}% · 💨${d.wind}km/h<br>📍 ${d.city}</div></div>`;
+    }
   }
-}
-
-// ══════════════════════════════════════════════════════════
-// COUNTDOWN RENDER
-// ══════════════════════════════════════════════════════════
-function pz(n){return String(n).padStart(2,'0');}
-function getDiff(date){const df=date-new Date();if(df<0)return null;return{d:Math.floor(df/864e5),h:Math.floor(df%864e5/36e5),m:Math.floor(df%36e5/6e4),s:Math.floor(df%6e4/1e3)};}
-function tagLabel(t){return{solar:'Dương lịch',lunar:'Âm lịch',holiday:'Nghỉ lễ',personal:'Cá nhân'}[t]||t;}
-
-function renderCountdown(){
-  const now=new Date();const filtered=allEvents.filter(e=>curFilter==='all'||e.tag===curFilter);
-  const up=filtered.filter(e=>e.date>now).sort((a,b)=>a.date-b.date);
-  const past=filtered.filter(e=>e.date<=now).sort((a,b)=>b.date-a.date);
-  if(up.length){const f=up[0],c=getDiff(f.date);document.getElementById('feat-name').textContent=(f.icon?f.icon+' ':'')+f.name;document.getElementById('feat-sub').textContent=f.date.toLocaleDateString('vi-VN',{weekday:'long',year:'numeric',month:'long',day:'numeric'})+(f.note?' · '+f.note:'');if(c)['d','h','m','s'].forEach(k=>document.getElementById('cd-'+k).textContent=pz(c[k]));}
-  const grid=document.getElementById('evgrid');grid.innerHTML='';
-  const CLRS={solar:'var(--sol)',lunar:'var(--lun)',holiday:'var(--hol)',personal:'var(--per)'};
-  [...up,...past].forEach((ev,i)=>{
-    const c=getDiff(ev.date),isPast=!c,isCustom=!!ev.id;
-    const card=document.createElement('div');
-    card.className='ecard'+(isPast?' passed':'');card.setAttribute('data-tag',ev.tag);card.onclick=()=>showDetail(ev);
-    const acts=isCustom?`<div class="card-acts"><button class="cact edit" onclick="event.stopPropagation();openEditForm('${ev.id}')">✏️</button><button class="cact del" onclick="event.stopPropagation();askDel('${ev.id}')">🗑️</button></div>`:'';
-    const locH=ev.location?`<div class="eloc">📍 ${ev.location}</div>`:'';
-    const wxH=ev.location?`<div class="ewx-row" id="ewx-${ev.id||'s'+i}"><span class="ewx-icon" style="animation:pulse 1.5s infinite">⏳</span><span style="font-size:11px;color:var(--muted)">Đang tải...</span></div>`:'';
-    const cdH=isPast?`<div class="epast">✓ Đã qua · ${ev.date.toLocaleDateString('vi-VN')}</div>`:`<div class="emini"><div class="mn"><span class="mn-num">${pz(c.d)}</span><span class="mn-lbl">ngày</span></div><span class="mn-sep">·</span><div class="mn"><span class="mn-num">${pz(c.h)}</span><span class="mn-lbl">giờ</span></div><span class="mn-sep">·</span><div class="mn"><span class="mn-num">${pz(c.m)}</span><span class="mn-lbl">phút</span></div></div>`;
-    card.innerHTML=`${acts}<span class="etag tg-${ev.tag}">${ev.icon||''} ${tagLabel(ev.tag)}</span><div class="ename">${ev.name}</div><div class="edate">${ev.date.toLocaleDateString('vi-VN',{weekday:'short',day:'numeric',month:'numeric',year:'numeric'})}${ev.note?' · '+ev.note:''}</div>${locH}${cdH}${wxH}`;
-    grid.appendChild(card);
-    if(ev.location){const wid=ev.id||'s'+i;fetchWx(ev.location).then(d=>{const el=document.getElementById('ewx-'+wid);if(!el)return;if(!d){el.innerHTML='<span class="ewx-icon">❓</span><span style="font-size:11px;color:var(--muted)">Không lấy được</span>';return;}el.innerHTML=`<span class="ewx-icon">${d.icon}</span><span class="ewx-temp">${d.temp}°C</span><span style="font-size:11px;color:var(--muted)">${d.desc} · ${d.city.split(',')[0]}</span>`;});}
-  });
-}
-
-function updateFeatCd(){
-  const now=new Date();const up=allEvents.filter(e=>e.date>now&&(curFilter==='all'||e.tag===curFilter)).sort((a,b)=>a.date-b.date);
-  if(!up.length)return;const c=getDiff(up[0].date);if(c)['d','h','m','s'].forEach(k=>document.getElementById('cd-'+k).textContent=pz(c[k]));
-}
-
-function fTag(tag){
-  curFilter=tag;document.querySelectorAll('.tb').forEach(b=>b.classList.remove('act'));
-  const t=document.querySelector(`.tb[data-tag="${tag}"]`);if(t)t.classList.add('act');renderCountdown();
 }
 
 // ══════════════════════════════════════════════════════════
 // CALENDAR
 // ══════════════════════════════════════════════════════════
-const MONTHS=['Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6','Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12'];
-const CLRS={solar:'var(--sol)',lunar:'var(--lun)',holiday:'var(--hol)',personal:'var(--per)'};
-
-function evOn(date){return allEvents.filter(e=>{const d=e.date;return d.getFullYear()===date.getFullYear()&&d.getMonth()===date.getMonth()&&d.getDate()===date.getDate();});}
-
-function renderCalendar(){
-  const sysForCal=getSysForYears(calYear,calYear+1);
-  const calEvs=[...sysForCal,...customEvents].filter(e=>e.date&&!isNaN(e.date));
-  const getEvOnCal=(date)=>calEvs.filter(e=>{const d=e.date;return d.getFullYear()===date.getFullYear()&&d.getMonth()===date.getMonth()&&d.getDate()===date.getDate();});
-  const now=new Date();
-  document.getElementById('cal-title').textContent=`${MONTHS[calMonth]}, ${calYear}`;
-  const grid=document.getElementById('calgrid');grid.innerHTML='';
-  const first=new Date(calYear,calMonth,1).getDay();const days=new Date(calYear,calMonth+1,0).getDate();const prev=new Date(calYear,calMonth,0).getDate();
-  const mkC=(date,other)=>{
-    const cell=document.createElement('div');
-    cell.className='cday'+(other?' other':'')+(date.toDateString()===now.toDateString()?' today':'')+(date.toDateString()===selDate.toDateString()?' sel':'')+(date.getDay()===0?' sun':'');
-    const evs=getEvOnCal(date);const[ld,lm]=LC.s2l(date.getDate(),date.getMonth()+1,date.getFullYear());
-    const hasDiary=diary[dKey(date)]?'●':'';
-    cell.innerHTML=`<div class="cday-num">${date.getDate()}</div><div class="cday-lun">${ld}/${lm}${hasDiary?' 📝':''}</div>${evs.length?`<div class="cdots">${evs.map(e=>`<span class="cdot cdot-${e.tag}"></span>`).join('')}</div>`:''}`;
-    cell.onclick=()=>pickDate(date,calEvs);return cell;
-  };
-  for(let i=first-1;i>=0;i--)grid.appendChild(mkC(new Date(calYear,calMonth-1,prev-i),true));
-  for(let d=1;d<=days;d++)grid.appendChild(mkC(new Date(calYear,calMonth,d),false));
-  const rem=(first+days)%7;if(rem)for(let d=1;d<=7-rem;d++)grid.appendChild(mkC(new Date(calYear,calMonth+1,d),true));
+function evOnDate(date, evList){
+  return evList.filter(e=>{
+    const d=e.date;
+    return d.getFullYear()===date.getFullYear()&&d.getMonth()===date.getMonth()&&d.getDate()===date.getDate();
+  });
 }
 
-function pickDate(date,calEvs){
-  selDate=date;renderCalendar();
+function renderCalendar(){
+  const sysEvs=getSysForRange(calYear, calYear+1);
+  const calEvs=[...sysEvs,...customEvents].filter(e=>e.date&&!isNaN(e.date));
+  const now=new Date();
+  document.getElementById('cal-title').textContent=`Tháng ${calMonth+1}, ${calYear}`;
+  const grid=document.getElementById('calgrid'); grid.innerHTML='';
+  const first=new Date(calYear,calMonth,1).getDay();
+  const days=new Date(calYear,calMonth+1,0).getDate();
+  const prev=new Date(calYear,calMonth,0).getDate();
+
+  const mkC=(date,other)=>{
+    const cell=document.createElement('div');
+    const evs=evOnDate(date,calEvs);
+    const isNow=date.toDateString()===now.toDateString();
+    const isSel=date.toDateString()===selDate.toDateString();
+    cell.className='cday'+(other?' other':'')+(isNow?' today':'')+(isSel?' sel':'')+(date.getDay()===0?' sun':'');
+    const[ld,lm]=LC.s2l(date.getDate(),date.getMonth()+1,date.getFullYear());
+    const hasDiary=diary[dKey(date)]?'📝':'';
+    const dotsHtml=evs.length?`<div class="cdots">${evs.map(e=>{const ti=getTagInfo(e.tag);return`<span class="cdot" style="background:${ti.color}"></span>`;}).join('')}</div>`:'';
+    cell.innerHTML=`<div class="cday-num">${date.getDate()}</div><div class="cday-lun">${ld}/${lm}${hasDiary}</div>${dotsHtml}`;
+    cell.onclick=()=>pickCalDate(date, calEvs); return cell;
+  };
+  for(let i=first-1;i>=0;i--) grid.appendChild(mkC(new Date(calYear,calMonth-1,prev-i),true));
+  for(let d=1;d<=days;d++) grid.appendChild(mkC(new Date(calYear,calMonth,d),false));
+  const rem=(first+days)%7; if(rem) for(let d=1;d<=7-rem;d++) grid.appendChild(mkC(new Date(calYear,calMonth+1,d),true));
+}
+
+function pickCalDate(date, calEvs){
+  selDate=date; renderCalendar();
   const[ld,lm,ly,ll]=LC.s2l(date.getDate(),date.getMonth()+1,date.getFullYear());
   document.getElementById('sel-date').textContent=date.toLocaleDateString('vi-VN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   document.getElementById('sel-lun').textContent=`🌙 ${ld}/${lm}${ll?'(nhuận)':''}/${ly} Âm lịch`;
-  const evs=calEvs.filter(e=>{const d=e.date;return d.getFullYear()===date.getFullYear()&&d.getMonth()===date.getMonth()&&d.getDate()===date.getDate();});
+  const evs=evOnDate(date, calEvs);
   const list=document.getElementById('dev-list');
-  const dk=dKey(date);const de=diary[dk];
-  const diaryHtml=de?`<div class="dev-item" onclick="showDiaryEntry('${dk}')" style="border-color:rgba(155,114,207,.3);"><span class="dev-dot" style="background:var(--per)"></span><div><div class="dev-name">${de.mood||''} Nhật ký</div><div class="dev-meta">${(de.text||'').slice(0,40)}${(de.text||'').length>40?'...':''}</div></div></div>`:'';
-  if(!evs.length&&!diaryHtml){list.innerHTML='<div class="no-ev">Không có sự kiện</div>';return;}
-  list.innerHTML=diaryHtml+evs.map(ev=>`<div class="dev-item" onclick="showDetail(allEvents.find(e=>e.id==='${ev.id||''}'))||showSysDetail('${ev.id}',${calYear})"><span class="dev-dot" style="background:${CLRS[ev.tag]}"></span><div style="flex:1;min-width:0;"><div class="dev-name">${ev.icon||''} ${ev.name}</div><div class="dev-meta">${tagLabel(ev.tag)}${ev.note?' · '+ev.note:''}</div></div>${ev.id?`<div style="display:flex;gap:3px;flex-shrink:0;"><button class="cact edit" onclick="event.stopPropagation();openEditForm('${ev.id}')">✏️</button><button class="cact del" onclick="event.stopPropagation();askDel('${ev.id}')">🗑️</button></div>`:''}</div>`).join('');
+  const dk=dKey(date); const de=diary[dk];
+  const diaryH=de?`<div class="dev-item" onclick="showDiaryEntry('${dk}')"><span class="dev-dot" style="background:var(--purple)"></span><div><div class="dev-name">${de.mood||''} Nhật ký</div><div class="dev-meta">${(de.text||'').slice(0,36)}${(de.text||'').length>36?'...':''}</div></div></div>`:'';
+  if(!evs.length&&!diaryH){list.innerHTML='<div class="no-ev">Không có sự kiện</div>';return;}
+  list.innerHTML=diaryH+evs.map(ev=>{
+    const ti=getTagInfo(ev.tag);
+    return`<div class="dev-item" onclick="showDetail(allEvents.find(e=>(e.id&&e.id==='${ev.id||''}')||(!e.id&&e.name==='${ev.name}'&&e.date.toISOString().startsWith('${ev.date.toISOString().slice(0,10)}')))">
+      <span class="dev-dot" style="background:${ti.color}"></span>
+      <div style="flex:1;min-width:0;">
+        <div class="dev-name">${ev.icon||''} ${ev.name}</div>
+        <div class="dev-meta">${ti.name}${ev.note?' · '+ev.note:''}</div>
+      </div>
+      ${ev.id?`<div style="display:flex;gap:3px;flex-shrink:0;"><button class="cact edit" onclick="event.stopPropagation();openEditForm('${ev.id}')">✏️</button><button class="cact del" onclick="event.stopPropagation();askDel('${ev.id}')">🗑️</button></div>`:''}
+    </div>`;
+  }).join('');
 }
 
-function showSysDetail(id,yr){const def=SYS_DEFS.find(d=>d.id===id);if(!def)return;try{const d=def.getDate(yr);if(d)showDetail({...def,date:d,isSys:true});}catch(e){}}
-function calNav(d){if(!d){calYear=new Date().getFullYear();calMonth=new Date().getMonth();}else{calMonth+=d;if(calMonth<0){calMonth=11;calYear--;}if(calMonth>11){calMonth=0;calYear++;}}renderCalendar();}
-function selDS(){const d=selDate;return`${d.getFullYear()}-${pz(d.getMonth()+1)}-${pz(d.getDate())}`;}
+function calNav(d){ if(!d){calYear=new Date().getFullYear();calMonth=new Date().getMonth();}else{calMonth+=d;if(calMonth<0){calMonth=11;calYear--;}if(calMonth>11){calMonth=0;calYear++;}} renderCalendar(); }
+function selDS(){ const d=selDate; return`${d.getFullYear()}-${pz(d.getMonth()+1)}-${pz(d.getDate())}`; }
 
 // ══════════════════════════════════════════════════════════
 // DIARY
 // ══════════════════════════════════════════════════════════
-function dKey(date){const d=date instanceof Date?date:new Date(date);return`${d.getFullYear()}-${pz(d.getMonth()+1)}-${pz(d.getDate())}`;}
+function dKey(date){ const d=date instanceof Date?date:new Date(date); return`${d.getFullYear()}-${pz(d.getMonth()+1)}-${pz(d.getDate())}`; }
 const TODAY_KEY=dKey(new Date());
 
 function initDiary(){
-  const now=new Date();const[ld,lm,ly]=LC.s2l(now.getDate(),now.getMonth()+1,now.getFullYear());
-  document.getElementById('diary-today-date').textContent=now.toLocaleDateString('vi-VN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const n=new Date(); const[ld,lm,ly]=LC.s2l(n.getDate(),n.getMonth()+1,n.getFullYear());
+  document.getElementById('diary-today-date').textContent=n.toLocaleDateString('vi-VN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   document.getElementById('diary-today-lun').textContent=`🌙 ${ld}/${lm}/${ly} Âm lịch`;
   const e=diary[TODAY_KEY];
   if(e){
     document.getElementById('diary-text').value=e.text||'';
-    if(e.mood){selectedMood=e.mood;document.querySelectorAll('.mood-btn').forEach(b=>{b.classList.toggle('sel',b.getAttribute('data-mood')===e.mood);});document.getElementById('diary-today-mood-show').textContent=e.mood;}
+    selectedMood=e.mood||'';
+    document.querySelectorAll('.mood-btn').forEach(b=>b.classList.toggle('sel',b.getAttribute('data-mood')===e.mood));
+    document.getElementById('diary-today-mood-show').textContent=e.mood||'';
     document.getElementById('diary-chars').textContent=`${(e.text||'').length} ký tự`;
   }
-  renderDiaryStats();renderMoodFilterBar();renderDiaryList();
+  renderDiaryStats(); renderMoodFilterBar(); renderDiaryList();
 }
 
 function pickMood(btn){
   selectedMood=btn.getAttribute('data-mood');
-  document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');
+  document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('sel')); btn.classList.add('sel');
   document.getElementById('diary-today-mood-show').textContent=selectedMood;
 }
 
@@ -1159,87 +1612,122 @@ function onDiaryInput(){
   const t=document.getElementById('diary-text').value;
   document.getElementById('diary-chars').textContent=`${t.length} ký tự`;
   document.getElementById('diary-saved').classList.remove('show');
-  clearTimeout(window._autoSave);window._autoSave=setTimeout(()=>saveDiary(true),2000);
+  clearTimeout(window._autoSave); window._autoSave=setTimeout(()=>saveDiary(true),2000);
 }
 
 async function saveDiary(auto=false){
   const text=document.getElementById('diary-text').value.trim();
-  if(!text&&!selectedMood)return;
-  diary[TODAY_KEY]={text,mood:selectedMood,ts:Date.now()};
-  await saveDiaryStore();
-  if(!auto){toast('✓ Đã lưu nhật ký hôm nay','ok');}
+  if(!text&&!selectedMood) return;
+  diary[TODAY_KEY]={text, mood:selectedMood, ts:Date.now()};
+  await syncDiary();
+  if(!auto) toast('✓ Đã lưu nhật ký hôm nay','ok');
   document.getElementById('diary-saved').classList.add('show');
   setTimeout(()=>document.getElementById('diary-saved').classList.remove('show'),2500);
-  renderDiaryStats();renderDiaryList();renderCalendar();
+  renderDiaryStats(); renderDiaryList(); renderCalendar();
 }
 
 function renderDiaryStats(){
-  const keys=Object.keys(diary);const total=keys.length;
-  const moodCounts={};keys.forEach(k=>{const m=diary[k].mood;if(m)moodCounts[m]=(moodCounts[m]||0)+1;});
-  const topMood=Object.entries(moodCounts).sort((a,b)=>b[1]-a[1])[0];const streak=calcStreak();
-  document.getElementById('diary-stats').innerHTML=`<div class="dstat"><div class="dstat-num">${total}</div><div class="dstat-lbl">Trang nhật ký</div></div><div class="dstat"><div class="dstat-num">${streak}</div><div class="dstat-lbl">Ngày liên tiếp</div></div><div class="dstat"><div class="dstat-num" style="font-size:22px;">${topMood?topMood[0]:'--'}</div><div class="dstat-lbl">Tâm trạng chủ đạo</div></div>`;
+  const keys=Object.keys(diary); const total=keys.length;
+  const moodCounts={};
+  keys.forEach(k=>{const m=diary[k].mood;if(m)moodCounts[m]=(moodCounts[m]||0)+1;});
+  const topMood=Object.entries(moodCounts).sort((a,b)=>b[1]-a[1])[0];
+  let s=0; let day=new Date();
+  while(true){const k=dKey(day);if(!diary[k])break;s++;day.setDate(day.getDate()-1);}
+  document.getElementById('diary-stats').innerHTML=`
+    <div class="dstat"><div class="dstat-num">${total}</div><div class="dstat-lbl">Trang nhật ký</div></div>
+    <div class="dstat"><div class="dstat-num">${s}</div><div class="dstat-lbl">Ngày liên tiếp</div></div>
+    <div class="dstat"><div class="dstat-num" style="font-size:20px;">${topMood?topMood[0]:'--'}</div><div class="dstat-lbl">Tâm trạng chủ đạo</div></div>`;
 }
-
-function calcStreak(){let s=0,d=new Date();while(true){const k=dKey(d);if(!diary[k])break;s++;d.setDate(d.getDate()-1);}return s;}
 
 function renderMoodFilterBar(){
-  const bar=document.getElementById('diary-filter-bar');const usedMoods=[...new Set(Object.values(diary).map(e=>e.mood).filter(Boolean))];
-  bar.innerHTML=`<button class="mf-btn ${moodFilter==='all'?'act':''}" data-mf="all" onclick="setMoodFilter('all')">Tất cả</button>`+usedMoods.map(m=>`<button class="mf-btn ${moodFilter===m?'act':''}" data-mf="${m}" onclick="setMoodFilter('${m}')">${m}</button>`).join('');
+  const bar=document.getElementById('diary-filter-bar');
+  const moods=[...new Set(Object.values(diary).map(e=>e.mood).filter(Boolean))];
+  bar.innerHTML=`<button class="mf-btn ${moodFilter==='all'?'act':''}" onclick="setMoodFilter('all')">Tất cả</button>`
+    +moods.map(m=>`<button class="mf-btn ${moodFilter===m?'act':''}" onclick="setMoodFilter('${m}')">${m}</button>`).join('');
 }
 
-function setMoodFilter(m){moodFilter=m;renderMoodFilterBar();renderDiaryList();}
+function setMoodFilter(m){ moodFilter=m; renderMoodFilterBar(); renderDiaryList(); }
 
 function renderDiaryList(){
   const q=(document.getElementById('diary-search').value||'').toLowerCase().trim();
   let entries=Object.entries(diary).sort((a,b)=>b[0].localeCompare(a[0]));
-  if(moodFilter!=='all')entries=entries.filter(([,v])=>v.mood===moodFilter);
-  if(q)entries=entries.filter(([k,v])=>v.text&&v.text.toLowerCase().includes(q));
+  if(moodFilter!=='all') entries=entries.filter(([,v])=>v.mood===moodFilter);
+  if(q) entries=entries.filter(([k,v])=>v.text&&v.text.toLowerCase().includes(q));
   const list=document.getElementById('diary-list');
   if(!entries.length){list.innerHTML='<div class="diary-empty">Chưa có nhật ký nào.<br>Hãy bắt đầu viết hôm nay! ✍️</div>';return;}
   list.innerHTML=entries.map(([k,v])=>{
-    const date=new Date(k);const[ld,lm]=LC.s2l(date.getDate(),date.getMonth()+1,date.getFullYear());const isToday=k===TODAY_KEY;
-    return`<div class="diary-entry" onclick="showDiaryEntry('${k}')"><div class="de-hdr"><div><div class="de-date">${isToday?'🔵 Hôm nay ':''}${date.toLocaleDateString('vi-VN',{weekday:'short',day:'numeric',month:'short',year:'numeric'})}</div></div><div style="display:flex;align-items:center;gap:6px;"><span class="de-mood">${v.mood||''}</span><button class="de-del" onclick="event.stopPropagation();delDiary('${k}')" title="Xoá">✕</button></div></div><div class="de-preview">${v.text||'(Không có nội dung)'}</div><div class="de-lun">🌙 ${ld}/${lm} · ${new Date(v.ts||k).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})}</div></div>`;
+    const date=new Date(k); const[ld,lm]=LC.s2l(date.getDate(),date.getMonth()+1,date.getFullYear());
+    const isT=k===TODAY_KEY;
+    return`<div class="diary-entry" onclick="showDiaryEntry('${k}')">
+      <div class="de-hdr">
+        <div><div class="de-date">${isT?'🔵 Hôm nay · ':''}${date.toLocaleDateString('vi-VN',{weekday:'short',day:'numeric',month:'short',year:'numeric'})}</div></div>
+        <div style="display:flex;align-items:center;gap:5px;"><span class="de-mood">${v.mood||''}</span><button class="de-del" onclick="event.stopPropagation();delDiary('${k}')">✕</button></div>
+      </div>
+      <div class="de-preview">${v.text||'(Không có nội dung)'}</div>
+      <div class="de-lun">🌙 ${ld}/${lm} · ${v.ts?new Date(v.ts).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}):''}</div>
+    </div>`;
   }).join('');
 }
 
 function showDiaryEntry(k){
-  const e=diary[k];if(!e)return;
-  const date=new Date(k);const[ld,lm,ly]=LC.s2l(date.getDate(),date.getMonth()+1,date.getFullYear());
+  const e=diary[k]; if(!e) return;
+  const date=new Date(k); const[ld,lm,ly]=LC.s2l(date.getDate(),date.getMonth()+1,date.getFullYear());
   document.getElementById('dv-title').textContent=date.toLocaleDateString('vi-VN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  document.getElementById('dv-body').innerHTML=`<div style="background:var(--surface2);border-radius:12px;padding:18px;margin-bottom:16px;"><div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;"><span style="font-size:40px;">${e.mood||'📝'}</span><div><div style="font-size:13px;font-weight:700;">${date.toLocaleDateString('vi-VN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div><div style="font-size:12px;color:var(--lun);margin-top:3px;">🌙 ${ld}/${lm}/${ly} Âm lịch</div>${e.mood?`<div style="font-size:11px;color:var(--muted);margin-top:3px;">Tâm trạng: ${e.mood}</div>`:''}</div></div></div><div style="background:var(--surface2);border-radius:12px;padding:18px;font-size:14px;line-height:1.8;white-space:pre-wrap;color:var(--text);min-height:80px;">${e.text||'<em style="color:var(--muted)">Không có nội dung</em>'}</div><div style="margin-top:14px;display:flex;gap:8px;">${k===TODAY_KEY?`<button class="btn-p" onclick="closeOverlay('ov-diary');showPage('diary')">✏️ Sửa hôm nay</button>`:''}<button class="btn-danger" onclick="closeOverlay('ov-diary');delDiary('${k}')">🗑️ Xoá trang này</button></div>`;
+  document.getElementById('dv-body').innerHTML=`
+    <div style="background:var(--surface2);border-radius:12px;padding:16px;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:11px;margin-bottom:10px;">
+        <span style="font-size:36px;">${e.mood||'📝'}</span>
+        <div><div style="font-size:13px;font-weight:700;">${date.toLocaleDateString('vi-VN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>
+        <div style="font-size:11px;color:var(--gold);margin-top:2px;">🌙 ${ld}/${lm}/${ly} Âm lịch</div></div>
+      </div>
+    </div>
+    <div style="background:var(--surface2);border-radius:11px;padding:16px;font-size:13px;line-height:1.8;white-space:pre-wrap;color:var(--text);min-height:80px;">${e.text||'<em style="color:var(--muted)">Không có nội dung</em>'}</div>
+    <div style="margin-top:12px;display:flex;gap:7px;">
+      ${k===TODAY_KEY?`<button class="btn-p" onclick="closeOverlay('ov-diary');showPage('diary')">✏️ Sửa hôm nay</button>`:''}
+      <button class="btn-danger" onclick="closeOverlay('ov-diary');delDiary('${k}')">🗑️ Xoá</button>
+    </div>`;
   openOverlay('ov-diary');
 }
 
 async function delDiary(k){
-  askConfirm('Xoá trang nhật ký này? Không thể khôi phục.',async ()=>{
-    delete diary[k];await saveDiaryStore();renderDiaryList();renderDiaryStats();renderMoodFilterBar();renderCalendar();toast('Đã xoá trang nhật ký','ok');
+  askConfirm('Xoá trang nhật ký này? Không thể khôi phục.',async()=>{
+    delete diary[k]; await syncDiary();
+    renderDiaryList(); renderDiaryStats(); renderMoodFilterBar(); renderCalendar();
+    toast('Đã xoá','ok');
   });
 }
 
 // ══════════════════════════════════════════════════════════
-// CONFIRM / DELETE
+// DELETE EVENT
 // ══════════════════════════════════════════════════════════
 async function askDel(id){
   const ev=customEvents.find(e=>e.id===id);
-  askConfirm(`Xoá sự kiện "${ev?.name||''}"? Không thể hoàn tác.`,async ()=>{
-    customEvents=customEvents.filter(e=>e.id!==id);await saveCustom();refreshAll();toast('Đã xoá sự kiện','ok');
+  askConfirm(`Xoá sự kiện "${ev?.name||''}"? Không thể hoàn tác.`, async()=>{
+    customEvents=customEvents.filter(e=>e.id!==id);
+    await syncCustom(); refreshAll(); toast('Đã xoá sự kiện','ok');
   });
 }
 
-function askConfirm(msg,cb){document.getElementById('conf-msg').textContent=msg;document.getElementById('conf-yes').onclick=()=>{closeConf();cb();};document.getElementById('conf').classList.add('open');}
-function closeConf(){document.getElementById('conf').classList.remove('open');}
-function refreshAll(){rebuild();renderCountdown();renderCalendar();renderDiaryList&&renderDiaryList();}
+// ══════════════════════════════════════════════════════════
+// CONFIRM / OVERLAYS
+// ══════════════════════════════════════════════════════════
+function askConfirm(msg, cb){
+  document.getElementById('conf-msg').textContent=msg;
+  document.getElementById('conf-yes').onclick=()=>{closeConf();cb();};
+  document.getElementById('conf').classList.add('open');
+}
+function closeConf(){ document.getElementById('conf').classList.remove('open'); }
+function openOverlay(id){ document.getElementById(id).classList.add('open'); }
+function closeOverlay(id){ document.getElementById(id).classList.remove('open'); }
+function bgClose(e,id){ if(e.target===document.getElementById(id)) closeOverlay(id); }
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') ['ov-form','ov-detail','ov-diary','ov-auth','ov-tags','conf'].forEach(id=>{
+    const el=document.getElementById(id); if(el&&el.classList.contains('open')) el.classList.remove('open');
+  });
+});
 
 // ══════════════════════════════════════════════════════════
-// OVERLAYS
-// ══════════════════════════════════════════════════════════
-function openOverlay(id){document.getElementById(id).classList.add('open');}
-function closeOverlay(id){document.getElementById(id).classList.remove('open');}
-function bgClose(e,id){if(e.target===document.getElementById(id))closeOverlay(id);}
-document.addEventListener('keydown',e=>{if(e.key==='Escape')['ov-form','ov-detail','ov-diary','ov-auth','conf'].forEach(id=>{const el=document.getElementById(id);if(el&&el.classList.contains('open'))el.classList.remove('open');});});
-
-// ══════════════════════════════════════════════════════════
-// PAGE NAV / CLOCK
+// PAGE NAV
 // ══════════════════════════════════════════════════════════
 function showPage(p){
   document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
@@ -1247,40 +1735,48 @@ function showPage(p){
   document.getElementById('page-'+p).classList.add('active');
   const idx={countdown:0,calendar:1,diary:2}[p]||0;
   document.querySelectorAll('nav button')[idx].classList.add('active');
-  if(p==='calendar'){renderCalendar();}
-  if(p==='diary'){initDiary();}
+  if(p==='calendar'){ renderCalendar(); loadMainWx(); }
+  if(p==='diary') initDiary();
 }
 
+// ══════════════════════════════════════════════════════════
+// CLOCK + LUNAR HEADER
+// ══════════════════════════════════════════════════════════
 function clock(){
   const n=new Date();
-  document.getElementById('live-time').textContent=n.toLocaleTimeString('vi-VN');
+  document.getElementById('live-time').textContent=n.toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
   document.getElementById('live-date').textContent=n.toLocaleDateString('vi-VN',{weekday:'short',day:'numeric',month:'numeric',year:'numeric'});
+  const[ld,lm,ly]=LC.s2l(n.getDate(),n.getMonth()+1,n.getFullYear());
+  document.getElementById('live-lunar').textContent=`🌙 ${ld} tháng ${lm} năm ${ly}`;
 }
 
-function tStr(){const t=new Date();return`${t.getFullYear()}-${pz(t.getMonth()+1)}-${pz(t.getDate())}`;}
-
-let _toast;
-function toast(msg,type='ok'){const el=document.getElementById('toast');el.textContent=msg;el.className='toast '+type+' show';clearTimeout(_toast);_toast=setTimeout(()=>el.classList.remove('show'),2800);}
+function refreshAll(){ rebuild(); renderCountdown(); renderCalendar(); }
+function tStr(){ const t=new Date(); return`${t.getFullYear()}-${pz(t.getMonth()+1)}-${pz(t.getDate())}`; }
+let _toast; function toast(msg,type='ok'){ const el=document.getElementById('toast');el.textContent=msg;el.className='toast '+type+' show';clearTimeout(_toast);_toast=setTimeout(()=>el.classList.remove('show'),2800);}
 
 // ══════════════════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════════════════
-rebuild();
-renderCountdown();
-renderCalendar();
-clock();
-loadMainWx();
-setSyncStatus('idle');
-// Init diary date labels early
-(()=>{const n=new Date();const[ld,lm,ly]=LC.s2l(n.getDate(),n.getMonth()+1,n.getFullYear());const el1=document.getElementById('diary-today-date');const el2=document.getElementById('diary-today-lun');if(el1)el1.textContent=n.toLocaleDateString('vi-VN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});if(el2)el2.textContent=`🌙 ${ld}/${lm}/${ly} Âm lịch`;})();
+(async function init(){
+  await loadContentFiles();
+  rebuild();
+  renderCountdown();
+  renderCalendar();
+  renderQuote();
+  clock();
+  loadMainWx();
+  setSyncStatus('idle');
+  // Init diary header
+  const n=new Date(); const[ld,lm,ly]=LC.s2l(n.getDate(),n.getMonth()+1,n.getFullYear());
+  const el1=document.getElementById('diary-today-date'); const el2=document.getElementById('diary-today-lun');
+  if(el1) el1.textContent=n.toLocaleDateString('vi-VN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  if(el2) el2.textContent=`🌙 ${ld}/${lm}/${ly} Âm lịch`;
 
-setInterval(()=>{clock();updateFeatCd();},1000);
-setInterval(loadMainWx,15*60*1000);
+  setInterval(()=>{clock();updateFeatCd();},1000);
+  setInterval(loadMainWx, 15*60*1000);
 
-// Verify auth token on load (async, non-blocking)
-if(authToken){
-  verifyToken().catch(()=>{});
-}
+  if(authToken) verifyToken().catch(()=>{});
+})();
 </script>
 </body>
 </html>
